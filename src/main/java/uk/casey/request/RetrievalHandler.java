@@ -1,26 +1,26 @@
 package uk.casey.request;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Arrays;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-import uk.casey.models.AccountsTableResponse;
-import uk.casey.models.PaymentRequest;
+import uk.casey.models.ProductsTableResponse;
 
-public class PaymentHandler implements HttpHandler {
+public class RetrievalHandler implements HttpHandler {
 
     public void handle(HttpExchange exchange) throws IOException {
-
-        PaymentService paymentService = new PaymentService();
+        ObjectMapper objectMapper = new ObjectMapper();
+        ProductService productService = new ProductService();
+        ProductsTableResponse productsTableResponse = new ProductsTableResponse();
 
         // Check basics of the users request before doing anything else
-        if (!"POST".equals(exchange.getRequestMethod())) {
+        if (!"GET".equals(exchange.getRequestMethod())) {
             exchange.sendResponseHeaders(405, -1); // Method Not Allowed
         }
 
@@ -31,47 +31,19 @@ public class PaymentHandler implements HttpHandler {
             return;
         }
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        PaymentRequest paymentRequest;
-
-        InputStream requestBody = exchange.getRequestBody();
-        StringBuilder body = new StringBuilder();
-        int ch;
-        while ((ch = requestBody.read()) != -1) {
-            body.append((char) ch);
-        }
-
-        try {
-            paymentRequest = objectMapper.readValue(body.toString(), PaymentRequest.class);
-        } catch (Exception e) {
-            exchange.sendResponseHeaders(400, -1);
-            System.out.println("Invalid JSON format");
-            return;
-        }
-
-        if (!paymentService.paymentRequestBodyIsValid(paymentRequest)) {
-            exchange.sendResponseHeaders(400, -1);
-            return;
-        }
-
         // Make GET call to DB to determine current state of Data
-        AccountsTableResponse dbResponse; 
+        List<ProductsTableResponse> dbResponse; 
         try {
-            dbResponse = paymentService.retrieveAccountsFromDatabase();
+            dbResponse = productService.retrieveProductsFromDatabase(1234, Arrays.asList(3));
         } catch (SQLException e) {
             exchange.sendResponseHeaders(500, -1);
             System.err.println("DataBase Error : " + e.getMessage());
             return;
         }
 
-        // Calculate values to send to DB
-        // Make PATCH call to DB
-        if (paymentService.savePaymentToDatabase(dbResponse, paymentRequest)) {
-            System.out.println("DB updated");
-
             Map<String, Object> responseMap = new HashMap<>();
             responseMap.put("processed", true);
-            responseMap.putAll(objectMapper.convertValue(paymentRequest, Map.class));
+            responseMap.putAll(objectMapper.convertValue(productsTableResponse, Map.class));
             String response = objectMapper.writeValueAsString(responseMap);
 
             // Return response to the User
@@ -79,8 +51,5 @@ public class PaymentHandler implements HttpHandler {
             exchange.getResponseBody().write(response.getBytes());
             exchange.getResponseBody().flush();
             exchange.getResponseBody().close();
-        } else {
-            exchange.sendResponseHeaders(500, -1); // Internal Server Error
-        }
     }
 }
