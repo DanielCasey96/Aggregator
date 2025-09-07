@@ -18,7 +18,7 @@ import uk.casey.models.ProductsTableResponseModel;
 
 public class ProductService {
 
-    public List<ProductsTableResponseModel> retrieveProductsFromDatabase(UUID userId, List<Integer> productIds) throws IOException, SQLException {
+    public List<ProductsTableResponseModel> retrieveProductsFromDatabase(UUID userId) throws IOException, SQLException {
         System.out.println("Starting to gather data from DB");
         Properties properties = new Properties();
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {

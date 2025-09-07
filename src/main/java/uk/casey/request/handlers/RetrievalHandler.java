@@ -26,16 +26,17 @@ public class RetrievalHandler implements HttpHandler {
         }
 
         String ContentType = exchange.getRequestHeaders().getFirst("Content-Type");
-        if (ContentType == null || !ContentType.equals("application/json")) {
+        String UserId = exchange.getRequestHeaders().getFirst("UserId");
+        if (ContentType == null || UserId == null || !ContentType.equals("application/json")) {
             exchange.sendResponseHeaders(400, -1); // Bad Request
-            System.out.println("Missing or invalid Content-Type header");
+            System.out.println("Invalid Headers");
             return;
         }
 
         // Make GET call to DB to determine current state of Data
         List<ProductsTableResponseModel> dbResponse; 
         try {
-            dbResponse = productService.retrieveProductsFromDatabase(java.util.UUID.fromString("12341234-1234-1234-1234-123412341234"), List.of(2));
+            dbResponse = productService.retrieveProductsFromDatabase(java.util.UUID.fromString(UserId));
         } catch (SQLException e) {
             exchange.sendResponseHeaders(500, -1);
             System.err.println("DataBase Error : " + e.getMessage());

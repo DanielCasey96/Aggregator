@@ -25,9 +25,25 @@ public class UpdateProductHandler implements HttpHandler {
         }
         
         String ContentType = exchange.getRequestHeaders().getFirst("Content-Type");
-        if (ContentType == null || !ContentType.equals("application/json")) {
+        String UserId = exchange.getRequestHeaders().getFirst("UserId");
+        if (ContentType == null || UserId == null || !ContentType.equals("application/json")) {
             exchange.sendResponseHeaders(400, -1); // Bad Request
             System.out.println("Missing or invalid Content-Type header");
+            return;
+        }
+
+        String path = exchange.getRequestURI().getPath();
+        String[] uriParts = path.split("/");
+        if (uriParts.length != 3 || !uriParts[1].equals("update-value")) {
+            exchange.sendResponseHeaders(404, -1);
+            return;
+        }
+
+        int id;
+        try {
+            id = Integer.parseInt(uriParts[2]);
+        } catch (NumberFormatException e) {
+            exchange.sendResponseHeaders(400, -1);
             return;
         }
        
@@ -58,7 +74,7 @@ public class UpdateProductHandler implements HttpHandler {
         }
 
         try {
-            productService.updateProductToDatabase(newValue, 3, java.util.UUID.fromString("12341234-1234-1234-1234-123412341234"));
+            productService.updateProductToDatabase(newValue, id, java.util.UUID.fromString(UserId));
             exchange.sendResponseHeaders(204, -1);
             exchange.getResponseBody().flush();
             exchange.getResponseBody().close();
