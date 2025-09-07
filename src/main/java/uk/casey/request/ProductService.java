@@ -119,4 +119,29 @@ public class ProductService {
             return rowsCreated > 0;
         }
     }
+
+    public boolean removeProductFromDataBase(UUID userId, int id) throws IOException, SQLException {
+        System.out.println("Starting to update DB");
+
+        Properties properties = new Properties();
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
+            properties.load(input);
+        }
+
+        String url = properties.getProperty("db.url");
+        String username = properties.getProperty("db.username");
+        String password = properties.getProperty("db.password");
+
+        String sql = "DELETE FROM products WHERE id = ? AND user_id = ?";
+
+        try (Connection connection = DriverManager.getConnection(url, username, password);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            statement.setObject(2, userId);
+
+            int rowsRemoved = statement.executeUpdate();
+            return rowsRemoved > 0;
+        }
+    }
+
 }
