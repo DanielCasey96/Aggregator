@@ -29,14 +29,6 @@ public class ProductService {
         String username = properties.getProperty("db.username");
         String password = properties.getProperty("db.password");
 
-        StringBuilder inClause = new StringBuilder();
-        for (int i = 0; i < productIds.size(); i++) {
-        inClause.append("?");
-        if (i < productIds.size() - 1) {
-            inClause.append(",");
-            }
-        }
-
         String sql = "SELECT id, name, type, provider, value, category, updated_at FROM products WHERE user_id = ?";
 
         List<ProductsTableResponseModel> products = new ArrayList<>();
