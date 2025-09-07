@@ -58,7 +58,7 @@ public class UpdateProductHandler implements HttpHandler {
         }
 
         try {
-    productService.updateProductToDatabase(newValue, 1, java.util.UUID.fromString("12341234-1234-1234-1234-123412341234"));
+    productService.updateProductToDatabase(newValue, 3, java.util.UUID.fromString("12341234-1234-1234-1234-123412341234"));
             exchange.sendResponseHeaders(204, -1);
             exchange.getResponseBody().flush();
             exchange.getResponseBody().close();
