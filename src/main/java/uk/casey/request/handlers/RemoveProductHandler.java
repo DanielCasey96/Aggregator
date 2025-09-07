@@ -17,11 +17,8 @@ public class RemoveProductHandler implements HttpHandler {
              return;
          }
 
-         String ContentType = exchange.getRequestHeaders().getFirst("Content-Type");
-         String UserId = exchange.getRequestHeaders().getFirst("UserId");
-         if (ContentType == null || UserId == null || !ContentType.equals("application/json")) {
-             exchange.sendResponseHeaders(400, -1); // Bad Request
-             System.out.println("Missing or invalid Content-Type header");
+         String userId = exchange.getRequestHeaders().getFirst("UserId");
+         if(!HandlerHelper.validateHeaders(exchange, userId)) {
              return;
          }
 
@@ -41,7 +38,7 @@ public class RemoveProductHandler implements HttpHandler {
          }
 
          try {
-             productService.removeProductFromDataBase(java.util.UUID.fromString(UserId), id);
+             productService.removeProductFromDataBase(java.util.UUID.fromString(userId), id);
              exchange.sendResponseHeaders(204, -1);
              exchange.getResponseBody().flush();
              exchange.getResponseBody().close();

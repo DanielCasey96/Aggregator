@@ -25,28 +25,24 @@ public class RetrievalHandler implements HttpHandler {
             return;
         }
 
-        String ContentType = exchange.getRequestHeaders().getFirst("Content-Type");
-        String UserId = exchange.getRequestHeaders().getFirst("UserId");
-        if (ContentType == null || UserId == null || !ContentType.equals("application/json")) {
-            exchange.sendResponseHeaders(400, -1); // Bad Request
-            System.out.println("Invalid Headers");
+        String userId = exchange.getRequestHeaders().getFirst("UserId");
+        if(!HandlerHelper.validateHeaders(exchange, userId)) {
             return;
         }
 
         // Make GET call to DB to determine current state of Data
         List<ProductsTableResponseModel> dbResponse; 
         try {
-            dbResponse = productService.retrieveProductsFromDatabase(java.util.UUID.fromString(UserId));
-        } catch (SQLException e) {
-            exchange.sendResponseHeaders(500, -1);
-            System.err.println("DataBase Error : " + e.getMessage());
-            return;
-        }
-
+            dbResponse = productService.retrieveProductsFromDatabase(java.util.UUID.fromString(userId));
             String response = objectMapper.writeValueAsString(dbResponse);
             exchange.sendResponseHeaders(200, response.length());
             exchange.getResponseBody().write(response.getBytes());
             exchange.getResponseBody().flush();
             exchange.getResponseBody().close();
+        } catch (SQLException e) {
+            exchange.sendResponseHeaders(500, -1);
+            System.err.println("DataBase Error : " + e.getMessage());
+            return;
+        }
     }
 }

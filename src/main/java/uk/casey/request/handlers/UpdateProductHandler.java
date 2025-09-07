@@ -14,55 +14,36 @@ import uk.casey.request.ProductService;
 
 public class UpdateProductHandler implements HttpHandler {
 
+    private final ProductService productService;
+
+    public UpdateProductHandler(ProductService productService) {
+        this.productService = productService;
+    }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
          ObjectMapper objectMapper = new ObjectMapper();
-         ProductService productService = new ProductService();
 
         if (!"POST".equals(exchange.getRequestMethod())) {
             exchange.sendResponseHeaders(405, -1); // Method Not Allowed
             return;
         }
-        
-        String ContentType = exchange.getRequestHeaders().getFirst("Content-Type");
-        String UserId = exchange.getRequestHeaders().getFirst("UserId");
-        if (ContentType == null || UserId == null || !ContentType.equals("application/json")) {
-            exchange.sendResponseHeaders(400, -1); // Bad Request
-            System.out.println("Missing or invalid Content-Type header");
+
+        // Header validation
+        String userId = exchange.getRequestHeaders().getFirst("UserId");
+        if(!HandlerHelper.validateHeaders(exchange, userId)) {
             return;
         }
 
+        // URL validation
         String path = exchange.getRequestURI().getPath();
-        String[] uriParts = path.split("/");
-        if (uriParts.length != 3 || !uriParts[1].equals("update-value")) {
-            exchange.sendResponseHeaders(404, -1);
+        int id = HandlerHelper.urlValidation(path, "update-value", exchange);
+        if (id == -1) {
             return;
         }
 
-        int id;
-        try {
-            id = Integer.parseInt(uriParts[2]);
-        } catch (NumberFormatException e) {
-            exchange.sendResponseHeaders(400, -1);
-            return;
-        }
-       
-        ValueModel valueModel;
-
-        InputStream requestBody = exchange.getRequestBody();
-        StringBuilder body = new StringBuilder();
-        int ch;
-        while ((ch = requestBody.read()) != -1) {
-            body.append((char) ch);
-        }
-
-        try {
-            valueModel = objectMapper.readValue(body.toString(), ValueModel.class);
-        } catch (Exception e) {
-            exchange.sendResponseHeaders(400, -1);
-            System.out.println("Invalid JSON format");
-            return;
-        }
+        // Parse the request body
+        ValueModel valueModel = HandlerHelper.parseRequestBody(exchange, objectMapper, ValueModel.class);
 
         BigDecimal newValue;
         try {
@@ -74,11 +55,11 @@ public class UpdateProductHandler implements HttpHandler {
         }
 
         try {
-            productService.updateProductToDatabase(newValue, id, java.util.UUID.fromString(UserId));
+            productService.updateProductToDatabase(newValue, id, java.util.UUID.fromString(userId));
             exchange.sendResponseHeaders(204, -1);
             exchange.getResponseBody().flush();
             exchange.getResponseBody().close();
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             exchange.sendResponseHeaders(500, -1);
             System.out.println("Error updating DataBase " + e.getMessage());
         }

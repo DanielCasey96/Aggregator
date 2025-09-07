@@ -22,11 +22,9 @@ public class NewProductHandler implements HttpHandler {
             exchange.sendResponseHeaders(405, -1); // Method Not Allowed
             return;
         }
-        
-        String ContentType = exchange.getRequestHeaders().getFirst("Content-Type");
-        if (ContentType == null || !ContentType.equals("application/json")) {
-            exchange.sendResponseHeaders(400, -1); // Bad Request
-            System.out.println("Missing or invalid Content-Type header");
+
+        String userId = exchange.getRequestHeaders().getFirst("UserId");
+        if(!HandlerHelper.validateHeaders(exchange, userId)) {
             return;
         }
 
