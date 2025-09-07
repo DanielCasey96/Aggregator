@@ -37,17 +37,12 @@ public class ProductService {
             }
         }
 
-        String sql = "SELECT id, name, type, provider, value, category, updated_at FROM products WHERE user_id = ? AND id IN (" + inClause + ")";
-        // id to be passed from the device
-        // user id to be passed from auth
+        String sql = "SELECT id, name, type, provider, value, category, updated_at FROM products WHERE user_id = ?";
 
         List<ProductsTableResponseModel> products = new ArrayList<>();
         try (Connection connection = DriverManager.getConnection(url, username, password);
-            PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setObject(1, userId);
-            for (int i = 0; i < productIds.size(); i++) {
-                statement.setInt(i + 2, productIds.get(i)); 
-        }
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setObject(1, userId);
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
                     ProductsTableResponseModel response = new ProductsTableResponseModel();

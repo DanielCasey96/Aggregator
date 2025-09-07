@@ -35,7 +35,7 @@ public class RetrievalHandler implements HttpHandler {
         // Make GET call to DB to determine current state of Data
         List<ProductsTableResponseModel> dbResponse; 
         try {
-            dbResponse = productService.retrieveProductsFromDatabase(java.util.UUID.fromString("12341234-1234-1234-1234-123412341234"), Arrays.asList(3));
+            dbResponse = productService.retrieveProductsFromDatabase(java.util.UUID.fromString("12341234-1234-1234-1234-123412341234"), List.of(2));
         } catch (SQLException e) {
             exchange.sendResponseHeaders(500, -1);
             System.err.println("DataBase Error : " + e.getMessage());
