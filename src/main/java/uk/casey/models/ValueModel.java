@@ -4,11 +4,15 @@ import java.math.BigDecimal;
 
 public class ValueModel {
 
-    private final BigDecimal value;
+    private BigDecimal value;
 
     public ValueModel(
         BigDecimal value) {
         this.value = value;
+    }
+
+    public ValueModel() {
+
     }
 
     private boolean isValid() {

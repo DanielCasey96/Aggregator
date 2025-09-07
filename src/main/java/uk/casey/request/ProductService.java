@@ -8,15 +8,17 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 
-import uk.casey.models.ProductsTableResponse;
+import uk.casey.models.ProductsTableResponseModel;
 
 public class ProductService {
 
-    public List<ProductsTableResponse> retrieveProductsFromDatabase(int userId, List<Integer> productIds) throws IOException, SQLException {
+    public List<ProductsTableResponseModel> retrieveProductsFromDatabase(UUID userId, List<Integer> productIds) throws IOException, SQLException {
         System.out.println("Starting to gather data from DB");
         Properties properties = new Properties();
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
@@ -35,34 +37,36 @@ public class ProductService {
             }
         }
 
-        String sql = "SELECT id, name, type, provider, value, category, updated_at FROM aggregator WHERE user_id = ? AND id IN (" + inClause + ")";
+        String sql = "SELECT id, name, type, provider, value, category, updated_at FROM products WHERE user_id = ? AND id IN (" + inClause + ")";
         // id to be passed from the device
         // user id to be passed from auth
 
-        List<ProductsTableResponse> products = new ArrayList<>();
+        List<ProductsTableResponseModel> products = new ArrayList<>();
         try (Connection connection = DriverManager.getConnection(url, username, password);
             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, userId);
+                statement.setObject(1, userId);
             for (int i = 0; i < productIds.size(); i++) {
                 statement.setInt(i + 2, productIds.get(i)); 
         }
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
-                    ProductsTableResponse response = new ProductsTableResponse();
+                    ProductsTableResponseModel response = new ProductsTableResponseModel();
                     response.setId(rs.getInt("id"));
                     response.setName(rs.getString("name"));
                     response.setType(rs.getString("type"));
                     response.setProvider(rs.getString("provider"));
-                    response.setCategory(rs.getString("category"));
                     response.setValue(rs.getBigDecimal("value"));
+                    response.setCategory(rs.getString("category"));
                     response.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    products.add(response);
                 }
             }
         }
+        System.out.println("Products found: " + products.size());
         return products;
     }
 
-    public boolean updateProductToDatabase(BigDecimal newValue, int id) throws IOException, SQLException{
+    public boolean updateProductToDatabase(BigDecimal newValue, int id, UUID userId) throws IOException, SQLException{
         System.out.println("Starting to update DB");
 
         Properties properties = new Properties();
@@ -74,19 +78,45 @@ public class ProductService {
         String username = properties.getProperty("db.username");
         String password = properties.getProperty("db.password");
 
-        String sql = "UPDATE products SET value = ? WHERE id = ?";
+        String sql = "UPDATE products SET value = ? WHERE id = ? AND user_id = ?";
 
         try (Connection connection = DriverManager.getConnection(url, username, password);
             PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setBigDecimal(1, newValue);
                 statement.setInt(2, id);
+                statement.setObject(3, userId);
 
                 int rowsUpdated = statement.executeUpdate();
                 return rowsUpdated > 0;
             }  
     }
 
-    public void createProductInDataBase() throws IOException {
+    public boolean createProductInDataBase(String userId, String name, String type, String provider, String category, BigDecimal value, Timestamp updated_at) throws IOException, SQLException{
+        System.out.println("Starting to update DB");
 
+        Properties properties = new Properties();
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
+            properties.load(input);
+        }
+
+        String url = properties.getProperty("db.url");
+        String username = properties.getProperty("db.username");
+        String password = properties.getProperty("db.password");
+
+        String sql = "INSERT INTO products (user_id, name, type, provider, category, value, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)"; 
+
+        try (Connection connection = DriverManager.getConnection(url, username, password);
+        PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setObject(1, UUID.fromString(userId));
+            statement.setString(2, name);
+            statement.setString(3, type);
+            statement.setString(4, provider);
+            statement.setString(5, category); // can be null
+            statement.setBigDecimal(6, value);
+            statement.setTimestamp(7, updated_at);
+
+            int rowsCreated = statement.executeUpdate();
+            return rowsCreated > 0;
+        }
     }
 }

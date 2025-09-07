@@ -1,4 +1,4 @@
-package uk.casey.request;
+package uk.casey.request.handlers;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +10,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import uk.casey.models.ValueModel;
+import uk.casey.request.ProductService;
 
 public class UpdateProductHandler implements HttpHandler {
 
@@ -57,7 +58,7 @@ public class UpdateProductHandler implements HttpHandler {
         }
 
         try {
-        productService.updateProductToDatabase(newValue, 1, 1234);
+    productService.updateProductToDatabase(newValue, 1, java.util.UUID.fromString("12341234-1234-1234-1234-123412341234"));
             exchange.sendResponseHeaders(204, -1);
             exchange.getResponseBody().flush();
             exchange.getResponseBody().close();

@@ -4,13 +4,20 @@ import java.net.InetSocketAddress;
 
 import com.sun.net.httpserver.HttpServer;
 
-public class PaymentController {
+import uk.casey.request.handlers.NewProductHandler;
+import uk.casey.request.handlers.RetrievalHandler;
+import uk.casey.request.handlers.UpdateProductHandler;
 
-    private HttpServer httpServer;
+public class AggregateController {
 
-    public PaymentController() throws Exception {
+    private final HttpServer httpServer;
+
+    public AggregateController() throws Exception {
         httpServer = HttpServer.create(new InetSocketAddress("localhost", 8080), 0);
-        httpServer.createContext("/payment", new PaymentHandler());
+        httpServer.createContext("/add-product", new NewProductHandler());
+        httpServer.createContext("/accounts", new RetrievalHandler());
+        httpServer.createContext("/update-value", new UpdateProductHandler());
+        // httpServer.createContext("/remove-product", new RemoveProductHandler());
         httpServer.setExecutor(null);
         httpServer.start();
     }
