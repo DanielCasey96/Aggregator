@@ -3,7 +3,7 @@ package uk.casey.models;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
-public class ProductsTableResponse {
+public class ProductsTableResponseModel {
 
     private Integer id;
     private String name;
@@ -13,7 +13,7 @@ public class ProductsTableResponse {
     private BigDecimal value;
     private Timestamp updatedAt;
 
-    ProductsTableResponse(
+    ProductsTableResponseModel(
            Integer id,
            String name,
            String type,
@@ -30,7 +30,7 @@ public class ProductsTableResponse {
         this.updatedAt = updatedAt;
     }
 
-    public ProductsTableResponse() {
+    public ProductsTableResponseModel() {
     }
 
         public Integer getId() {

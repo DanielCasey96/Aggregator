@@ -2,9 +2,10 @@ package uk.casey.request;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
@@ -13,7 +14,8 @@ import com.sun.net.httpserver.HttpHandler;
 import uk.casey.models.ProductsTableResponse;
 
 public class RetrievalHandler implements HttpHandler {
-
+    
+    @Override
     public void handle(HttpExchange exchange) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         ProductService productService = new ProductService();
