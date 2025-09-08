@@ -30,20 +30,28 @@ public class HandlerHelper {
         return true;
     }
 
-    public static int urlValidation(String path, String uri, HttpExchange exchange) throws IOException {
+    public static Integer validateUrlWithId(String path, String endpoint, HttpExchange exchange) throws IOException {
         String[] uriParts = path.split("/");
-        if (uriParts.length != 3 || !uriParts[1].equals(uri)) {
+        if (uriParts.length == 3 && uriParts[1].equals(endpoint)) {
+            try {
+                return Integer.parseInt(uriParts[2]);
+            } catch (NumberFormatException e) {
+                exchange.sendResponseHeaders(400, -1);
+                return -1;
+            }
+        } else {
             exchange.sendResponseHeaders(404, -1);
             return -1;
         }
+    }
 
-        int id;
-        try {
-            id = Integer.parseInt(uriParts[2]);
-            return id;
-        } catch (NumberFormatException e) {
-            exchange.sendResponseHeaders(400, -1);
-            return -1;
+    public static boolean validateUrlNoId(String path, String endpoint, HttpExchange exchange) throws IOException {
+        String[] uriParts = path.split("/");
+        if (uriParts.length == 2 && uriParts[1].equals(endpoint)) {
+            return true;
+        } else {
+            exchange.sendResponseHeaders(404, -1);
+            return false;
         }
     }
 

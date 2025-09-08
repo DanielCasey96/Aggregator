@@ -17,10 +17,10 @@ public class AggregateController {
 
     public AggregateController() throws Exception {
         httpServer = HttpServer.create(new InetSocketAddress("localhost", 8080), 0);
-        httpServer.createContext("/add-product", new NewProductHandler());
-        httpServer.createContext("/accounts", new RetrievalHandler());
+        httpServer.createContext("/add-product", new NewProductHandler(productService));
+        httpServer.createContext("/accounts", new RetrievalHandler(productService));
         httpServer.createContext("/update-value", new UpdateProductHandler(productService));
-        httpServer.createContext("/remove-product", new RemoveProductHandler());
+        httpServer.createContext("/remove-product", new RemoveProductHandler(productService));
         httpServer.setExecutor(null);
         httpServer.start();
     }

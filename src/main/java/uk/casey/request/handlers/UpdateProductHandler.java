@@ -1,7 +1,6 @@
 package uk.casey.request.handlers;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 
@@ -37,7 +36,7 @@ public class UpdateProductHandler implements HttpHandler {
 
         // URL validation
         String path = exchange.getRequestURI().getPath();
-        int id = HandlerHelper.urlValidation(path, "update-value", exchange);
+        int id = HandlerHelper.validateUrlWithId(path, "update-value", exchange);
         if (id == -1) {
             return;
         }

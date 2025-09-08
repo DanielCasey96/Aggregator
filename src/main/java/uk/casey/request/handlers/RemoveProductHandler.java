@@ -9,9 +9,14 @@ import java.sql.SQLException;
 
 public class RemoveProductHandler implements HttpHandler {
 
+    private final ProductService productService;
+
+    public RemoveProductHandler(ProductService productService) {
+        this.productService = productService;
+    }
+
      @Override
      public void handle(HttpExchange exchange) throws IOException {
-         ProductService productService = new ProductService();
          if (!"DELETE".equals(exchange.getRequestMethod())) {
              exchange.sendResponseHeaders(405, -1); // Method Not Allowed
              return;
@@ -22,18 +27,10 @@ public class RemoveProductHandler implements HttpHandler {
              return;
          }
 
+         // URL validation
          String path = exchange.getRequestURI().getPath();
-         String[] uriParts = path.split("/");
-         if (uriParts.length != 3 || !uriParts[1].equals("remove-product")) {
-             exchange.sendResponseHeaders(404, -1);
-             return;
-         }
-
-         int id;
-         try {
-             id = Integer.parseInt(uriParts[2]);
-         } catch (NumberFormatException e) {
-             exchange.sendResponseHeaders(400, -1);
+         int id = HandlerHelper.validateUrlWithId(path, "remove-product", exchange);
+         if (id == -1) {
              return;
          }
 
@@ -42,7 +39,7 @@ public class RemoveProductHandler implements HttpHandler {
              exchange.sendResponseHeaders(204, -1);
              exchange.getResponseBody().flush();
              exchange.getResponseBody().close();
-         } catch (SQLException e) {
+         } catch (SQLException | IOException e) {
              exchange.sendResponseHeaders(500, -1);
              System.err.println("Error updating DataBase " + e.getMessage());
          }

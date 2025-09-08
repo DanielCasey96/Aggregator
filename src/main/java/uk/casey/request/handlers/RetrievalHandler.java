@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -13,11 +14,16 @@ import uk.casey.models.ProductsTableResponseModel;
 import uk.casey.request.ProductService;
 
 public class RetrievalHandler implements HttpHandler {
+
+    private final ProductService productService;
+
+    public RetrievalHandler(ProductService productService) {
+        this.productService = productService;
+    }
     
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        ProductService productService = new ProductService();
 
         // Check basics of the users request before doing anything else
         if (!"GET".equals(exchange.getRequestMethod())) {
@@ -30,6 +36,10 @@ public class RetrievalHandler implements HttpHandler {
             return;
         }
 
+        // URL validation
+        String path = exchange.getRequestURI().getPath();
+        HandlerHelper.validateUrlNoId(path, "accounts", exchange);
+
         // Make GET call to DB to determine current state of Data
         List<ProductsTableResponseModel> dbResponse; 
         try {
@@ -39,10 +49,9 @@ public class RetrievalHandler implements HttpHandler {
             exchange.getResponseBody().write(response.getBytes());
             exchange.getResponseBody().flush();
             exchange.getResponseBody().close();
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             exchange.sendResponseHeaders(500, -1);
             System.err.println("DataBase Error : " + e.getMessage());
-            return;
         }
     }
 }
