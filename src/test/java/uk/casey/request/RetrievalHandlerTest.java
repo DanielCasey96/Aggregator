@@ -144,7 +144,7 @@ public class RetrievalHandlerTest {
     }
 
     @Test
-    void validUrlReturnsId() throws Exception {
+    void validUrlReturnsSuccess() throws Exception {
         HttpExchange exchange = mock(HttpExchange.class);
         boolean result = HandlerHelper.validateUrlNoId("/accounts", "accounts", exchange);
         assertEquals(true, result);

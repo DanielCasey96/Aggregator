@@ -1,7 +1,9 @@
 package uk.casey.models;
 
+import java.util.UUID;
+
 public class ProductRequestModel {
-    private String userId;
+    private UUID userId;
     private String name;
     private String type;
     private String provider;
@@ -11,7 +13,7 @@ public class ProductRequestModel {
 
     public ProductRequestModel() {}
 
-    public ProductRequestModel(String userId, String name, String type, String provider, String category, java.math.BigDecimal value, java.sql.Timestamp updatedAt) {
+    public ProductRequestModel(UUID userId, String name, String type, String provider, String category, java.math.BigDecimal value, java.sql.Timestamp updatedAt) {
         this.userId = userId;
         this.name = name;
         this.type = type;
@@ -21,11 +23,11 @@ public class ProductRequestModel {
         this.updatedAt = updatedAt;
     }
 
-    public String getUserId() {
+    public UUID getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(UUID userId) {
         this.userId = userId;
     }
 

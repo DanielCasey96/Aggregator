@@ -1,11 +1,13 @@
 package uk.casey.request.handlers;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import uk.casey.request.ProductService;
-
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.UUID;
+
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+
+import uk.casey.request.ProductService;
 
 public class RemoveProductHandler implements HttpHandler {
 
@@ -22,10 +24,11 @@ public class RemoveProductHandler implements HttpHandler {
              return;
          }
 
-         String userId = exchange.getRequestHeaders().getFirst("UserId");
-         if(!HandlerHelper.validateHeaders(exchange, userId)) {
+        String userIdStr = exchange.getRequestHeaders().getFirst("UserId");
+        if(!HandlerHelper.validateHeaders(exchange, userIdStr)) {
              return;
          }
+         UUID userId = UUID.fromString(userIdStr);
 
          // URL validation
          String path = exchange.getRequestURI().getPath();
@@ -35,7 +38,7 @@ public class RemoveProductHandler implements HttpHandler {
          }
 
          try {
-             productService.removeProductFromDataBase(java.util.UUID.fromString(userId), id);
+             productService.removeProductFromDataBase(userId, id);
              exchange.sendResponseHeaders(204, -1);
              exchange.getResponseBody().flush();
              exchange.getResponseBody().close();

@@ -1,8 +1,8 @@
 package uk.casey.request.handlers;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
@@ -22,14 +22,15 @@ public class NewProductHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
+        ProductRequestModel prm;
 
         if (!"POST".equals(exchange.getRequestMethod())) {
             exchange.sendResponseHeaders(405, -1); // Method Not Allowed
             return;
         }
 
-        String userId = exchange.getRequestHeaders().getFirst("UserId");
-        if(!HandlerHelper.validateHeaders(exchange, userId)) {
+        String userIdStr = exchange.getRequestHeaders().getFirst("UserId");
+        if(!HandlerHelper.validateHeaders(exchange, userIdStr)) {
             return;
         }
 
@@ -38,10 +39,10 @@ public class NewProductHandler implements HttpHandler {
         HandlerHelper.validateUrlNoId(path, "add-product", exchange);
 
         // Parse the request body
-        ProductRequestModel prm  = HandlerHelper.parseRequestBody(exchange, objectMapper, ProductRequestModel.class);
+        prm  = HandlerHelper.parseRequestBody(exchange, objectMapper, ProductRequestModel.class);
 
         try {
-            productService.createProductInDataBase("12341234-1234-1234-1234-123412341234", prm.getName(), prm.getType(), prm.getProvider(), prm.getCategory(), prm.getValue(), prm.getUpdatedAt());
+            productService.createProductInDataBase(prm.getUserId(), prm.getName(), prm.getType(), prm.getProvider(), prm.getCategory(), prm.getValue(), prm.getUpdatedAt());
             exchange.sendResponseHeaders(201, -1);
             exchange.getResponseBody().flush();
             exchange.getResponseBody().close();

@@ -1,30 +1,33 @@
 package uk.casey.request.handlers;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.UUID;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 public class HandlerHelper {
 
-    public static boolean validateHeaders(HttpExchange exchange, String userId) throws IOException {
+    public static boolean validateHeaders(HttpExchange exchange, String userIdStr) throws IOException {
+
         String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
         if (contentType == null || !contentType.equals("application/json")) {
             exchange.sendResponseHeaders(400, -1);
             System.out.println("Missing or invalid Content-Type header");
             return false;
         }
-        if (userId == null) {
+        if (userIdStr == null) {
             exchange.sendResponseHeaders(400, -1);
             System.out.println("Missing UserId header");
             return false;
         }
+        UUID userId;
         try {
-            java.util.UUID.fromString(userId);
+            userId = UUID.fromString(userIdStr);
         } catch (IllegalArgumentException e) {
             exchange.sendResponseHeaders(400, -1);
-            System.out.println("Invalid UserId format: " + userId);
+            System.out.println("Invalid UserId format");
             return false;
         }
         return true;

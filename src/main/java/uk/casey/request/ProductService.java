@@ -78,7 +78,7 @@ public class ProductService {
             }  
     }
 
-    public boolean createProductInDataBase(String userId, String name, String type, String provider, String category, BigDecimal value, Timestamp updated_at) throws IOException, SQLException{
+    public boolean createProductInDataBase(UUID userId, String name, String type, String provider, String category, BigDecimal value, Timestamp updated_at) throws IOException, SQLException{
         System.out.println("Starting to update DB");
 
         Properties properties = new Properties();
@@ -94,7 +94,7 @@ public class ProductService {
 
         try (Connection connection = DriverManager.getConnection(url, username, password);
         PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setObject(1, UUID.fromString(userId));
+            statement.setObject(1, userId);
             statement.setString(2, name);
             statement.setString(3, type);
             statement.setString(4, provider);

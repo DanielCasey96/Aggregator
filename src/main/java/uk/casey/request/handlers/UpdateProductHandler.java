@@ -3,6 +3,7 @@ package uk.casey.request.handlers;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
@@ -29,10 +30,11 @@ public class UpdateProductHandler implements HttpHandler {
         }
 
         // Header validation
-        String userId = exchange.getRequestHeaders().getFirst("UserId");
-        if(!HandlerHelper.validateHeaders(exchange, userId)) {
+        String userIdStr = exchange.getRequestHeaders().getFirst("UserId");
+        if(!HandlerHelper.validateHeaders(exchange, userIdStr)) {
             return;
         }
+        UUID userId = UUID.fromString(userIdStr);
 
         // URL validation
         String path = exchange.getRequestURI().getPath();
@@ -54,7 +56,7 @@ public class UpdateProductHandler implements HttpHandler {
         }
 
         try {
-            productService.updateProductToDatabase(newValue, id, java.util.UUID.fromString(userId));
+            productService.updateProductToDatabase(newValue, id, userId);
             exchange.sendResponseHeaders(204, -1);
             exchange.getResponseBody().flush();
             exchange.getResponseBody().close();

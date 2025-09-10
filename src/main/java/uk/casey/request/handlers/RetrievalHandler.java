@@ -2,11 +2,10 @@ package uk.casey.request.handlers;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -31,10 +30,11 @@ public class RetrievalHandler implements HttpHandler {
             return;
         }
 
-        String userId = exchange.getRequestHeaders().getFirst("UserId");
-        if(!HandlerHelper.validateHeaders(exchange, userId)) {
+        String userIdStr = exchange.getRequestHeaders().getFirst("UserId");
+        if(!HandlerHelper.validateHeaders(exchange, userIdStr)) {
             return;
         }
+        UUID userId = UUID.fromString(userIdStr);
 
         // URL validation
         String path = exchange.getRequestURI().getPath();
@@ -43,7 +43,7 @@ public class RetrievalHandler implements HttpHandler {
         // Make GET call to DB to determine current state of Data
         List<ProductsTableResponseModel> dbResponse; 
         try {
-            dbResponse = productService.retrieveProductsFromDatabase(java.util.UUID.fromString(userId));
+            dbResponse = productService.retrieveProductsFromDatabase(userId);
             String response = objectMapper.writeValueAsString(dbResponse);
             exchange.sendResponseHeaders(200, response.length());
             exchange.getResponseBody().write(response.getBytes());
