@@ -2,7 +2,6 @@ package uk.casey.request.handlers;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;

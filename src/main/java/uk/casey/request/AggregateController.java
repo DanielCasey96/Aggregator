@@ -8,7 +8,7 @@ import uk.casey.request.handlers.NewProductHandler;
 import uk.casey.request.handlers.RemoveProductHandler;
 import uk.casey.request.handlers.RetrievalHandler;
 import uk.casey.request.handlers.UpdateProductHandler;
-import uk.casey.request.ProductService;
+import uk.casey.request.handlers.RegistrationHandler;
 
 public class AggregateController {
 
@@ -21,6 +21,7 @@ public class AggregateController {
         httpServer.createContext("/accounts", new RetrievalHandler(productService));
         httpServer.createContext("/update-value", new UpdateProductHandler(productService));
         httpServer.createContext("/remove-product", new RemoveProductHandler(productService));
+        httpServer.createContext("/register", new RegistrationHandler());
         httpServer.setExecutor(null);
         httpServer.start();
     }
