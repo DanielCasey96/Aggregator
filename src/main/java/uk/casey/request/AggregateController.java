@@ -4,11 +4,12 @@ import java.net.InetSocketAddress;
 
 import com.sun.net.httpserver.HttpServer;
 
+import uk.casey.request.handlers.AuthorisationHandler;
 import uk.casey.request.handlers.NewProductHandler;
+import uk.casey.request.handlers.RegistrationHandler;
 import uk.casey.request.handlers.RemoveProductHandler;
 import uk.casey.request.handlers.RetrievalHandler;
 import uk.casey.request.handlers.UpdateProductHandler;
-import uk.casey.request.handlers.RegistrationHandler;
 
 public class AggregateController {
 
@@ -22,6 +23,7 @@ public class AggregateController {
         httpServer.createContext("/update-value", new UpdateProductHandler(productService));
         httpServer.createContext("/remove-product", new RemoveProductHandler(productService));
         httpServer.createContext("/register", new RegistrationHandler());
+        httpServer.createContext("/authorise", new AuthorisationHandler());
         httpServer.setExecutor(null);
         httpServer.start();
     }
