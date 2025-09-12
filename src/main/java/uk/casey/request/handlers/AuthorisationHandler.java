@@ -33,7 +33,7 @@ public class AuthorisationHandler implements HttpHandler {
 
         String path = exchange.getRequestURI().getPath();
         boolean validUrl = HandlerHelper.validateUrlNoId(path, "authorise", exchange);
-        if(validUrl == false) {
+        if(!validUrl) {
             exchange.sendResponseHeaders(404, -1);
         }
 

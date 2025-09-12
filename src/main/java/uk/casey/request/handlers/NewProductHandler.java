@@ -9,13 +9,16 @@ import com.sun.net.httpserver.HttpHandler;
 
 import uk.casey.models.ProductRequestModel;
 import uk.casey.request.ProductService;
+import uk.casey.utils.JwtUtil;
 
 public class NewProductHandler implements HttpHandler {
 
     private final ProductService productService;
+    private final JwtUtil jwtUtil;
 
-    public NewProductHandler(ProductService productService) {
+    public NewProductHandler(ProductService productService, JwtUtil jwtUtil) {
         this.productService = productService;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -30,6 +33,12 @@ public class NewProductHandler implements HttpHandler {
 
         String userIdStr = exchange.getRequestHeaders().getFirst("UserId");
         if(!HandlerHelper.validateHeaders(exchange, userIdStr)) {
+            return;
+        }
+
+        String token = exchange.getRequestHeaders().getFirst("Authorisation");
+        if (!JwtUtil.validateToken(token)) {
+            exchange.sendResponseHeaders(401, -1);
             return;
         }
 

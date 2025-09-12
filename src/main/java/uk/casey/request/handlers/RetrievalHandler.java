@@ -11,6 +11,7 @@ import com.sun.net.httpserver.HttpHandler;
 
 import uk.casey.models.ProductsTableResponseModel;
 import uk.casey.request.ProductService;
+import uk.casey.utils.JwtUtil;
 
 public class RetrievalHandler implements HttpHandler {
 
@@ -35,6 +36,12 @@ public class RetrievalHandler implements HttpHandler {
             return;
         }
         UUID userId = UUID.fromString(userIdStr);
+
+        String token = exchange.getRequestHeaders().getFirst("Authorisation");
+        if (!JwtUtil.validateToken(token)) {
+            exchange.sendResponseHeaders(401, -1);
+            return;
+        }
 
         // URL validation
         String path = exchange.getRequestURI().getPath();
