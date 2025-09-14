@@ -1,5 +1,13 @@
+buildscript {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
 plugins {
     id 'java'
+    id 'jacoco'
 }
 
 group = 'org.example'
@@ -23,15 +31,28 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 }
 
-test {
-    useJUnitPlatform()
-    testLogging {
-        events "passed", "failed", "skipped"
-        showStandardStreams = false
-    }
-    afterSuite { desc, result ->
-        if (!desc.parent) {
-            println "Test summary: ${result.testCount} run, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped"
+tasks.named("test", Test.class, test -> {
+    test.useJUnitPlatform();
+    test.finalizedBy("jacocoTestReport");
+
+    test.testLogging(logging -> {
+        logging.events("PASSED", "SKIPPED", "FAILED");
+        logging.exceptionFormat("FULL");
+        logging.setShowExceptions(true);
+        logging.setShowCauses(true);
+        logging.setShowStackTraces(true);
+    });
+
+    test.afterSuite((desc, result) -> {
+        if (desc.getParent() == null) {
+            System.out.println("Test summary: " + result.getTestCount() + " run, " +
+                    result.getSuccessfulTestCount() + " passed, " +
+                    result.getFailedTestCount() + " failed, " +
+                    result.getSkippedTestCount() + " skipped");
         }
-    }
-}
+    });
+});
+
+tasks.named("jacocoTestReport", JacocoReport.class, jacocoTestReport -> {
+    jacocoTestReport.dependsOn(tasks.named("test"));
+});

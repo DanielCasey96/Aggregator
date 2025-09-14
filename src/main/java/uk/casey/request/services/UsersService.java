@@ -58,7 +58,6 @@ public class UsersService implements UsersServiceInterface {
             statement.setObject(1, userId);
             statement.setString(2, customerUsername);
             statement.setString(3, passcode);
-            System.out.println("Made connection");
 
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next() && rs.getInt(1) > 0) {
