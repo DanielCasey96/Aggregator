@@ -25,7 +25,6 @@ public class AuthorisationHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         LoginRequestModel loginRequestModel;
-        ProductService productService = new ProductService();
 
         if (!"POST".equals(exchange.getRequestMethod())) {
             exchange.sendResponseHeaders(405, -1);
@@ -53,11 +52,8 @@ public class AuthorisationHandler implements HttpHandler {
         try {
             boolean authenticated = usersServiceInterface.queryDataOfDatabase(userId, loginRequestModel.getUsername(), loginRequestModel.getPasscode());
             if (authenticated) {
-                System.out.println("Is authenticated");
                 String token = JwtUtil.generateToken(userId, loginRequestModel.getUsername());
-                System.out.println("token " + token);
                 exchange.sendResponseHeaders(200, token.getBytes().length);
-                System.out.println("should be 200");
                 exchange.getResponseBody().write(token.getBytes());
                 exchange.getResponseBody().flush();
                 exchange.getResponseBody().close();
