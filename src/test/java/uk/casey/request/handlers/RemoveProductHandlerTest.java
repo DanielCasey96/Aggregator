@@ -1,31 +1,25 @@
-package uk.casey.request;
+package uk.casey.request.handlers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
-import uk.casey.models.ValueModel;
-import uk.casey.request.handlers.UpdateProductHandler;
-import java.sql.SQLException;
+import uk.casey.request.services.ProductServiceInterface;
+import uk.casey.utils.JwtUtil;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
-import uk.casey.request.handlers.HandlerHelper;
-import uk.casey.request.services.ProductServiceInterface;
-import uk.casey.utils.JwtUtil;
-
-public class UpdateProductHandlerTest {
+public class RemoveProductHandlerTest {
 
     private HttpExchange exchange;
     private ProductServiceInterface productServiceInterface;
@@ -40,22 +34,22 @@ public class UpdateProductHandlerTest {
 
     @Tag("unit-integration")
     @Test
-    void updateProductHandlerSuccess() throws IOException {
+    void removeProductHandlerSuccess() throws IOException {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
-        when(exchange.getRequestMethod()).thenReturn("POST");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
+        when(exchange.getRequestMethod()).thenReturn("DELETE");
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/remove-product/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
-        when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream("{\"value\":123.45}".getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
 
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
+
+            RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
             handler.handle(exchange);
 
             verify(exchange).getRequestMethod();
@@ -65,24 +59,25 @@ public class UpdateProductHandlerTest {
         }
     }
 
+    @Tag("unit-integration")
     @Test
-    void updateProductIsFlushedAndClosedAfterSuccessfulUpdate() throws IOException {
+    void removeProductIsFlushedAndClosedAfterSuccessfulUpdate() throws IOException {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
-        when(exchange.getRequestMethod()).thenReturn("POST");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
+        when(exchange.getRequestMethod()).thenReturn("DELETE");
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/remove-product/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
-        when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream("{\"value\":123.45}".getBytes()));
+        when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
         OutputStream responseBody = mock(OutputStream.class);
         when(exchange.getResponseBody()).thenReturn(responseBody);
 
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
+            RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
             handler.handle(exchange);
 
             verify(responseBody).flush();
@@ -92,10 +87,10 @@ public class UpdateProductHandlerTest {
 
     @Tag("unit-integration")
     @Test
-    void returns405ForNonPostMethod() throws Exception {
-        when(exchange.getRequestMethod()).thenReturn("GET");
+    void returns405ForNonDeleteMethod() throws Exception {
+        when(exchange.getRequestMethod()).thenReturn("POST");
 
-        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
+        RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -109,10 +104,10 @@ public class UpdateProductHandlerTest {
         Headers headers = new Headers();
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
-        when(exchange.getRequestMethod()).thenReturn("POST");
+        when(exchange.getRequestMethod()).thenReturn("DELETE");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
+        RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -125,10 +120,10 @@ public class UpdateProductHandlerTest {
         headers.add("Content-Type", "application/txt");
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
-        when(exchange.getRequestMethod()).thenReturn("POST");
+        when(exchange.getRequestMethod()).thenReturn("DELETE");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
+        RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -140,10 +135,10 @@ public class UpdateProductHandlerTest {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
-        when(exchange.getRequestMethod()).thenReturn("POST");
+        when(exchange.getRequestMethod()).thenReturn("DELETE");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
+        RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -156,74 +151,39 @@ public class UpdateProductHandlerTest {
         headers.add("Content-Type", "application/json");
         headers.add("UserId", "notAUUIDFormat");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
-        when(exchange.getRequestMethod()).thenReturn("POST");
+        when(exchange.getRequestMethod()).thenReturn("DELETE");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
+        RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
     }
 
+    //Remove this is not specific to the handler
     @Test
     void validUrlReturnsId() throws Exception {
         HttpExchange exchange = mock(HttpExchange.class);
-        int id = HandlerHelper.validateUrlWithId("/update-value/42", "update-value", exchange);
+        int id = HandlerHelper.validateUrlWithId("/remove-product/42", "remove-product", exchange);
         assertEquals(42, id);
         verify(exchange, never()).sendResponseHeaders(anyInt(), anyLong());
     }
 
+    //Remove this is not specific to the handler
     @Test
     void invalidUrlReturns404() throws Exception {
         HttpExchange exchange = mock(HttpExchange.class);
-        int id = HandlerHelper.validateUrlWithId("/update/42", "update-value", exchange);
+        int id = HandlerHelper.validateUrlWithId("/remove/chicken/1", "remove-product", exchange);
         assertEquals(-1, id);
         verify(exchange).sendResponseHeaders(404, -1);
     }
 
+    //Remove this is not specific to the handler
     @Test
     void invalidUrlMissingIdReturns404() throws Exception {
         HttpExchange exchange = mock(HttpExchange.class);
-        int id = HandlerHelper.validateUrlWithId("/update-value", "update-value", exchange);
+        int id = HandlerHelper.validateUrlWithId("/remove-product", "remove-product", exchange);
         verify(exchange).sendResponseHeaders(404, -1);
-    }
-
-    @Test
-    void validRequestBodyReturnsValue() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = "{\"value\":123.45}";
-
-        when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream(json.getBytes()));
-
-        ValueModel valueModel = HandlerHelper.parseRequestBody(exchange, objectMapper, ValueModel.class);
-
-        Assertions.assertNotNull(valueModel);
-        assertEquals(new BigDecimal("123.45"), valueModel.getValue());
-    }
-
-    //Remove this is not specific to the handler
-    @Test
-    void invalidRequestBodyReturns400() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = "{";
-
-        when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream(json.getBytes()));
-
-        HandlerHelper.parseRequestBody(exchange, objectMapper, ValueModel.class);
-
-        verify(exchange).sendResponseHeaders(400, -1);
-    }
-
-    //Remove this is not specific to the handler
-    @Test
-    void invalidRequestBodyMissingReturns400() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        when(exchange.getRequestBody()).thenReturn(null);
-
-        HandlerHelper.parseRequestBody(exchange, objectMapper, ValueModel.class);
-
-        verify(exchange).sendResponseHeaders(400, -1);
     }
 
     @Tag("unit-integration")
@@ -234,22 +194,23 @@ public class UpdateProductHandlerTest {
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
-        when(exchange.getRequestMethod()).thenReturn("POST");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
+        when(exchange.getRequestMethod()).thenReturn("DELETE");
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/remove-product/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
-        when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream("{\"value\":123.45}".getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
-        doThrow(new SQLException("DB error SQL")).when(productServiceInterface).updateProductToDatabase(any(BigDecimal.class), anyInt(), any(UUID.class));
+        doThrow(new SQLException("DB error SQL")).when(productServiceInterface).removeProductFromDatabase(any(UUID.class), anyInt());
 
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
+
+            RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
             handler.handle(exchange);
 
             verify(exchange).sendResponseHeaders(500, -1);
         }
     }
+
 
     @Tag("unit-integration")
     @Test
@@ -259,21 +220,20 @@ public class UpdateProductHandlerTest {
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
-        when(exchange.getRequestMethod()).thenReturn("POST");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
+        when(exchange.getRequestMethod()).thenReturn("DELETE");
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/remove-product/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
-        when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream("{\"value\":123.45}".getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
-        doThrow(new IOException("DB error IO")).when(productServiceInterface).updateProductToDatabase(any(BigDecimal.class), anyInt(), any(UUID.class));
+        doThrow(new IOException("DB error IO")).when(productServiceInterface).removeProductFromDatabase(any(UUID.class), anyInt());
 
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
+
+            RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
             handler.handle(exchange);
 
             verify(exchange).sendResponseHeaders(500, -1);
         }
     }
-
 }

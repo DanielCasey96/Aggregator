@@ -1,12 +1,10 @@
-package uk.casey.request;
+package uk.casey.request.handlers;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import uk.casey.request.handlers.AuthorisationHandler;
-import uk.casey.request.handlers.RegistrationHandler;
 import uk.casey.request.services.UsersServiceInterface;
 
 import java.io.IOException;
