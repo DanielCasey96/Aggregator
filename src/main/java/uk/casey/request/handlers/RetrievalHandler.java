@@ -10,15 +10,17 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import uk.casey.models.ProductsTableResponseModel;
-import uk.casey.request.ProductService;
+import uk.casey.request.services.ProductServiceInterface;
 import uk.casey.utils.JwtUtil;
 
 public class RetrievalHandler implements HttpHandler {
 
-    private final ProductService productService;
+    private final ProductServiceInterface productServiceInterface;
+    private final JwtUtil jwtUtil;
 
-    public RetrievalHandler(ProductService productService) {
-        this.productService = productService;
+    public RetrievalHandler(ProductServiceInterface productServiceInterface, JwtUtil jwtUtil) {
+        this.productServiceInterface = productServiceInterface;
+        this.jwtUtil = jwtUtil;
     }
     
     @Override
@@ -50,7 +52,7 @@ public class RetrievalHandler implements HttpHandler {
         // Make GET call to DB to determine current state of Data
         List<ProductsTableResponseModel> dbResponse; 
         try {
-            dbResponse = productService.retrieveProductsFromDatabase(userId);
+            dbResponse = productServiceInterface.retrieveProductsFromDatabase(userId);
             String response = objectMapper.writeValueAsString(dbResponse);
             exchange.sendResponseHeaders(200, response.length());
             exchange.getResponseBody().write(response.getBytes());

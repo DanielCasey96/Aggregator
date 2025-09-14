@@ -10,15 +10,17 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import uk.casey.models.ValueModel;
-import uk.casey.request.ProductService;
+import uk.casey.request.services.ProductServiceInterface;
 import uk.casey.utils.JwtUtil;
 
 public class UpdateProductHandler implements HttpHandler {
 
-    private final ProductService productService;
+    private final ProductServiceInterface productServiceInterface;
+    private final JwtUtil jwtUtil;
 
-    public UpdateProductHandler(ProductService productService) {
-        this.productService = productService;
+    public UpdateProductHandler(ProductServiceInterface productServiceInterface, JwtUtil jwtUtil) {
+        this.productServiceInterface = productServiceInterface;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -63,7 +65,7 @@ public class UpdateProductHandler implements HttpHandler {
         }
 
         try {
-            productService.updateProductToDatabase(newValue, id, userId);
+            productServiceInterface.updateProductToDatabase(newValue, id, userId);
             exchange.sendResponseHeaders(204, -1);
             exchange.getResponseBody().flush();
             exchange.getResponseBody().close();

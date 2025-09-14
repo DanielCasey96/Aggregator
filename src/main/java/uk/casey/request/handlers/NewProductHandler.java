@@ -8,16 +8,16 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import uk.casey.models.ProductRequestModel;
-import uk.casey.request.ProductService;
+import uk.casey.request.services.ProductServiceInterface;
 import uk.casey.utils.JwtUtil;
 
 public class NewProductHandler implements HttpHandler {
 
-    private final ProductService productService;
+    private final ProductServiceInterface productServiceInterface;
     private final JwtUtil jwtUtil;
 
-    public NewProductHandler(ProductService productService, JwtUtil jwtUtil) {
-        this.productService = productService;
+    public NewProductHandler(ProductServiceInterface productServiceInterface, JwtUtil jwtUtil) {
+        this.productServiceInterface = productServiceInterface;
         this.jwtUtil = jwtUtil;
     }
 
@@ -50,7 +50,7 @@ public class NewProductHandler implements HttpHandler {
         prm  = HandlerHelper.parseRequestBody(exchange, objectMapper, ProductRequestModel.class);
 
         try {
-            productService.createProductInDataBase(prm.getUserId(), prm.getName(), prm.getType(), prm.getProvider(), prm.getCategory(), prm.getValue(), prm.getUpdatedAt());
+            productServiceInterface.createProductInDatabase(prm.getUserId(), prm.getName(), prm.getType(), prm.getProvider(), prm.getCategory(), prm.getValue(), prm.getUpdatedAt());
             exchange.sendResponseHeaders(201, -1);
             exchange.getResponseBody().flush();
             exchange.getResponseBody().close();

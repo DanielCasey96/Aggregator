@@ -7,16 +7,17 @@ import java.util.UUID;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-import uk.casey.request.ProductService;
+import uk.casey.request.services.ProductService;
+import uk.casey.request.services.ProductServiceInterface;
 import uk.casey.utils.JwtUtil;
 
 public class RemoveProductHandler implements HttpHandler {
 
-    private final ProductService productService;
+    private final ProductServiceInterface productServiceInterface;
     private final JwtUtil jwtUtil;
 
-    public RemoveProductHandler(ProductService productService, JwtUtil jwtUtil) {
-        this.productService = productService;
+    public RemoveProductHandler(ProductServiceInterface productServiceInterface, JwtUtil jwtUtil) {
+        this.productServiceInterface = productServiceInterface;
         this.jwtUtil = jwtUtil;
     }
 
@@ -47,7 +48,7 @@ public class RemoveProductHandler implements HttpHandler {
          }
 
          try {
-             productService.removeProductFromDataBase(userId, id);
+             productServiceInterface.removeProductFromDatabase(userId, id);
              exchange.sendResponseHeaders(204, -1);
              exchange.getResponseBody().flush();
              exchange.getResponseBody().close();

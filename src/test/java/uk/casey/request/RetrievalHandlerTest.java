@@ -5,14 +5,14 @@ import com.sun.net.httpserver.HttpExchange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import uk.casey.request.handlers.HandlerHelper;
 import uk.casey.request.handlers.RetrievalHandler;
-import uk.casey.request.handlers.UpdateProductHandler;
+import uk.casey.request.services.ProductServiceInterface;
+import uk.casey.utils.JwtUtil;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -24,12 +24,14 @@ import static org.mockito.Mockito.verify;
 public class RetrievalHandlerTest {
 
     private HttpExchange exchange;
-    private ProductService productService;
+    private ProductServiceInterface productServiceInterface;
+    private JwtUtil jwtUtil;
 
     @BeforeEach
     void setUp() {
         exchange = mock(HttpExchange.class);
-        productService = mock(ProductService.class);
+        productServiceInterface = mock(ProductServiceInterface.class);
+        jwtUtil = mock(JwtUtil.class);
     }
 
     @Tag("unit-integration")
@@ -38,19 +40,24 @@ public class RetrievalHandlerTest {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/accounts"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
 
-        RetrievalHandler handler = new RetrievalHandler(productService);
-        handler.handle(exchange);
+        try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
+            String token = headers.getFirst("Authorisation");
+            jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
+            RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
+            handler.handle(exchange);
 
-        verify(exchange).getRequestMethod();
-        verify(exchange, times(2)).getRequestHeaders();
-        verify(exchange).sendResponseHeaders(200, 2L);
-        verify(exchange, times(3)).getResponseBody();
+            verify(exchange).getRequestMethod();
+            verify(exchange, times(3)).getRequestHeaders();
+            verify(exchange).sendResponseHeaders(200, 2L);
+            verify(exchange, times(3)).getResponseBody();
+        }
     }
 
     @Test
@@ -58,6 +65,7 @@ public class RetrievalHandlerTest {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/accounts"));
@@ -65,11 +73,15 @@ public class RetrievalHandlerTest {
         OutputStream responseBody = mock(OutputStream.class);
         when(exchange.getResponseBody()).thenReturn(responseBody);
 
-        RetrievalHandler handler = new RetrievalHandler(productService);
-        handler.handle(exchange);
+        try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
+            String token = headers.getFirst("Authorisation");
+            jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
+            RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
+            handler.handle(exchange);
 
-        verify(responseBody).flush();
-        verify(responseBody).close();
+            verify(responseBody).flush();
+            verify(responseBody).close();
+        }
     }
 
     @Tag("unit-integration")
@@ -77,7 +89,7 @@ public class RetrievalHandlerTest {
     void returns405ForNonGetMethod() throws Exception {
         when(exchange.getRequestMethod()).thenReturn("POST");
 
-        RetrievalHandler handler = new RetrievalHandler(productService);
+        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -90,10 +102,11 @@ public class RetrievalHandlerTest {
     void returns400ForMissingContentType() throws IOException {
         Headers headers = new Headers();
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
         when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RetrievalHandler handler = new RetrievalHandler(productService);
+        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -105,10 +118,11 @@ public class RetrievalHandlerTest {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/txt");
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
         when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RetrievalHandler handler = new RetrievalHandler(productService);
+        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -122,7 +136,7 @@ public class RetrievalHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RetrievalHandler handler = new RetrievalHandler(productService);
+        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -134,10 +148,11 @@ public class RetrievalHandlerTest {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
         headers.add("UserId", "notAUUIDFormat");
+        headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
         when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RetrievalHandler handler = new RetrievalHandler(productService);
+        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -164,17 +179,21 @@ public class RetrievalHandlerTest {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/accounts"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
-        doThrow(new SQLException("DB error SQL")).when(productService).retrieveProductsFromDatabase(any(UUID.class));
+        doThrow(new SQLException("DB error SQL")).when(productServiceInterface).retrieveProductsFromDatabase(any(UUID.class));
+        try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
+            String token = headers.getFirst("Authorisation");
+            jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
+            RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
+            handler.handle(exchange);
 
-        RetrievalHandler handler = new RetrievalHandler(productService);
-        handler.handle(exchange);
-
-        verify(exchange).sendResponseHeaders(500, -1);
+            verify(exchange).sendResponseHeaders(500, -1);
+        }
     }
 
     @Tag("unit-integration")
@@ -183,17 +202,23 @@ public class RetrievalHandlerTest {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/accounts"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
-        doThrow(new IOException("DB error IO")).when(productService).retrieveProductsFromDatabase(any(UUID.class));
+        doThrow(new IOException("DB error IO")).when(productServiceInterface).retrieveProductsFromDatabase(any(UUID.class));
 
-        RetrievalHandler handler = new RetrievalHandler(productService);
-        handler.handle(exchange);
+        try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
+            String token = headers.getFirst("Authorisation");
+            jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
 
-        verify(exchange).sendResponseHeaders(500, -1);
+            RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
+            handler.handle(exchange);
+
+            verify(exchange).sendResponseHeaders(500, -1);
+        }
     }
 
 }

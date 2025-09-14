@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import uk.casey.models.RegistrationRequestModel;
-import uk.casey.request.ProductService;
+import uk.casey.request.services.ProductService;
+import uk.casey.request.services.ProductServiceInterface;
+import uk.casey.request.services.UsersServiceInterface;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -12,11 +14,16 @@ import java.util.UUID;
 
 public class RegistrationHandler implements HttpHandler {
 
+    private final UsersServiceInterface usersServiceInterface;
+
+    public RegistrationHandler(UsersServiceInterface usersServiceInterface) {
+        this.usersServiceInterface = usersServiceInterface;
+    }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         RegistrationRequestModel registrationRequestModel;
-        ProductService productService = new ProductService();
 
         if (!"POST".equals(exchange.getRequestMethod())) {
             exchange.sendResponseHeaders(405, -1);
@@ -40,7 +47,7 @@ public class RegistrationHandler implements HttpHandler {
         }
 
         try {
-            UUID userId = productService.registerWithDataBase(registrationRequestModel.getUsername(), registrationRequestModel.getPasscode(), registrationRequestModel.getEmail());
+            UUID userId = usersServiceInterface.registerWithDatabase(registrationRequestModel.getUsername(), registrationRequestModel.getPasscode(), registrationRequestModel.getEmail());
             String response = "{\"userId\": \"" + userId + "\"}";
             exchange.sendResponseHeaders(201, response.getBytes().length);
             exchange.getResponseBody().write(response.getBytes());

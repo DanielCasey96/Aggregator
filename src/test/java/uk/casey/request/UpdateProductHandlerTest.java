@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import uk.casey.models.ValueModel;
 import uk.casey.request.handlers.UpdateProductHandler;
 import java.sql.SQLException;
@@ -21,16 +22,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import uk.casey.request.handlers.HandlerHelper;
+import uk.casey.request.services.ProductServiceInterface;
+import uk.casey.utils.JwtUtil;
 
 public class UpdateProductHandlerTest {
 
     private HttpExchange exchange;
-    private ProductService productService;
+    private ProductServiceInterface productServiceInterface;
+    private JwtUtil jwtUtil;
 
     @BeforeEach
     void setUp() {
         exchange = mock(HttpExchange.class);
-        productService = mock(ProductService.class);
+        productServiceInterface = mock(ProductServiceInterface.class);
+        jwtUtil = mock(JwtUtil.class);
     }
 
     @Tag("unit-integration")
@@ -39,6 +44,7 @@ public class UpdateProductHandlerTest {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
@@ -46,13 +52,17 @@ public class UpdateProductHandlerTest {
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream("{\"value\":123.45}".getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
 
-        UpdateProductHandler handler = new UpdateProductHandler(productService);
-        handler.handle(exchange);
+        try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
+            String token = headers.getFirst("Authorisation");
+            jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
+            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
+            handler.handle(exchange);
 
-        verify(exchange).getRequestMethod();
-        verify(exchange, times(2)).getRequestHeaders();
-        verify(exchange, times(2)).getResponseBody();
-        verify(exchange).sendResponseHeaders(204, -1);
+            verify(exchange).getRequestMethod();
+            verify(exchange, times(3)).getRequestHeaders();
+            verify(exchange, times(2)).getResponseBody();
+            verify(exchange).sendResponseHeaders(204, -1);
+        }
     }
 
     @Test
@@ -60,6 +70,7 @@ public class UpdateProductHandlerTest {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
@@ -68,11 +79,15 @@ public class UpdateProductHandlerTest {
         OutputStream responseBody = mock(OutputStream.class);
         when(exchange.getResponseBody()).thenReturn(responseBody);
 
-        UpdateProductHandler handler = new UpdateProductHandler(productService);
-        handler.handle(exchange);
+        try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
+            String token = headers.getFirst("Authorisation");
+            jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
+            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
+            handler.handle(exchange);
 
-        verify(responseBody).flush();
-        verify(responseBody).close();
+            verify(responseBody).flush();
+            verify(responseBody).close();
+        }
     }
 
     @Tag("unit-integration")
@@ -80,7 +95,7 @@ public class UpdateProductHandlerTest {
     void returns405ForNonPostMethod() throws Exception {
         when(exchange.getRequestMethod()).thenReturn("GET");
 
-        UpdateProductHandler handler = new UpdateProductHandler(productService);
+        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -93,10 +108,11 @@ public class UpdateProductHandlerTest {
     void returns400ForMissingContentType() throws IOException {
         Headers headers = new Headers();
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        UpdateProductHandler handler = new UpdateProductHandler(productService);
+        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -108,10 +124,11 @@ public class UpdateProductHandlerTest {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/txt");
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        UpdateProductHandler handler = new UpdateProductHandler(productService);
+        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -122,10 +139,11 @@ public class UpdateProductHandlerTest {
     void returns400ForMissingUserId() throws IOException {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
+        headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        UpdateProductHandler handler = new UpdateProductHandler(productService);
+        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -137,10 +155,11 @@ public class UpdateProductHandlerTest {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
         headers.add("UserId", "notAUUIDFormat");
+        headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        UpdateProductHandler handler = new UpdateProductHandler(productService);
+        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -189,7 +208,7 @@ public class UpdateProductHandlerTest {
 
         when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream(json.getBytes()));
 
-        ValueModel valueModel = HandlerHelper.parseRequestBody(exchange, objectMapper, ValueModel.class);
+        HandlerHelper.parseRequestBody(exchange, objectMapper, ValueModel.class);
 
         verify(exchange).sendResponseHeaders(400, -1);
     }
@@ -200,7 +219,7 @@ public class UpdateProductHandlerTest {
 
         when(exchange.getRequestBody()).thenReturn(null);
 
-        ValueModel valueModel = HandlerHelper.parseRequestBody(exchange, objectMapper, ValueModel.class);
+        HandlerHelper.parseRequestBody(exchange, objectMapper, ValueModel.class);
 
         verify(exchange).sendResponseHeaders(400, -1);
     }
@@ -211,18 +230,23 @@ public class UpdateProductHandlerTest {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream("{\"value\":123.45}".getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
-        doThrow(new SQLException("DB error SQL")).when(productService).updateProductToDatabase(any(BigDecimal.class), anyInt(), any(UUID.class));
+        doThrow(new SQLException("DB error SQL")).when(productServiceInterface).updateProductToDatabase(any(BigDecimal.class), anyInt(), any(UUID.class));
 
-        UpdateProductHandler handler = new UpdateProductHandler(productService);
-        handler.handle(exchange);
+        try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
+            String token = headers.getFirst("Authorisation");
+            jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
+            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
+            handler.handle(exchange);
 
-        verify(exchange).sendResponseHeaders(500, -1);
+            verify(exchange).sendResponseHeaders(500, -1);
+        }
     }
 
     @Tag("unit-integration")
@@ -231,18 +255,23 @@ public class UpdateProductHandlerTest {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream("{\"value\":123.45}".getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
-        doThrow(new IOException("DB error IO")).when(productService).updateProductToDatabase(any(BigDecimal.class), anyInt(), any(UUID.class));
+        doThrow(new IOException("DB error IO")).when(productServiceInterface).updateProductToDatabase(any(BigDecimal.class), anyInt(), any(UUID.class));
 
-        UpdateProductHandler handler = new UpdateProductHandler(productService);
-        handler.handle(exchange);
+        try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
+            String token = headers.getFirst("Authorisation");
+            jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
+            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, jwtUtil);
+            handler.handle(exchange);
 
-        verify(exchange).sendResponseHeaders(500, -1);
+            verify(exchange).sendResponseHeaders(500, -1);
+        }
     }
 
 }

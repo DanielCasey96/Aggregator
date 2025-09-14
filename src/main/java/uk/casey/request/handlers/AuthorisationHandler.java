@@ -9,10 +9,17 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import uk.casey.models.LoginRequestModel;
-import uk.casey.request.ProductService;
+import uk.casey.request.services.ProductService;
+import uk.casey.request.services.UsersServiceInterface;
 import uk.casey.utils.JwtUtil;
 
 public class AuthorisationHandler implements HttpHandler {
+
+    private final UsersServiceInterface usersServiceInterface;
+
+    public AuthorisationHandler(UsersServiceInterface usersServiceInterface) {
+        this.usersServiceInterface = usersServiceInterface;
+    }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -44,7 +51,7 @@ public class AuthorisationHandler implements HttpHandler {
         }
 
         try {
-            boolean authenticated = productService.queryDataOfDataBase(userId, loginRequestModel.getUsername(), loginRequestModel.getPasscode());
+            boolean authenticated = usersServiceInterface.queryDataOfDatabase(userId, loginRequestModel.getUsername(), loginRequestModel.getPasscode());
             if (authenticated) {
                 System.out.println("Is authenticated");
                 String token = JwtUtil.generateToken(userId, loginRequestModel.getUsername());
