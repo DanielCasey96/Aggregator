@@ -201,6 +201,7 @@ public class UpdateProductHandlerTest {
         assertEquals(new BigDecimal("123.45"), valueModel.getValue());
     }
 
+    //Remove this is not specific to the handler
     @Test
     void invalidRequestBodyReturns400() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -213,6 +214,7 @@ public class UpdateProductHandlerTest {
         verify(exchange).sendResponseHeaders(400, -1);
     }
 
+    //Remove this is not specific to the handler
     @Test
     void invalidRequestBodyMissingReturns400() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();

@@ -158,6 +158,7 @@ public class RetrievalHandlerTest {
         verify(exchange).sendResponseHeaders(400, -1);
     }
 
+    //Remove this is not specific to the handler
     @Test
     void validUrlReturnsSuccess() throws Exception {
         HttpExchange exchange = mock(HttpExchange.class);
@@ -166,6 +167,7 @@ public class RetrievalHandlerTest {
         verify(exchange, never()).sendResponseHeaders(anyInt(), anyLong());
     }
 
+    //Remove this is not specific to the handler
     @Test
     void invalidUrlReturns404() throws Exception {
         HttpExchange exchange = mock(HttpExchange.class);

@@ -8,13 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import uk.casey.request.handlers.HandlerHelper;
 import uk.casey.request.handlers.RemoveProductHandler;
-import uk.casey.request.services.ProductService;
 import uk.casey.request.services.ProductServiceInterface;
 import uk.casey.utils.JwtUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -164,6 +162,7 @@ public class RemoveProductHandlerTest {
         verify(exchange).sendResponseHeaders(400, -1);
     }
 
+    //Remove this is not specific to the handler
     @Test
     void validUrlReturnsId() throws Exception {
         HttpExchange exchange = mock(HttpExchange.class);
@@ -172,6 +171,7 @@ public class RemoveProductHandlerTest {
         verify(exchange, never()).sendResponseHeaders(anyInt(), anyLong());
     }
 
+    //Remove this is not specific to the handler
     @Test
     void invalidUrlReturns404() throws Exception {
         HttpExchange exchange = mock(HttpExchange.class);
@@ -180,6 +180,7 @@ public class RemoveProductHandlerTest {
         verify(exchange).sendResponseHeaders(404, -1);
     }
 
+    //Remove this is not specific to the handler
     @Test
     void invalidUrlMissingIdReturns404() throws Exception {
         HttpExchange exchange = mock(HttpExchange.class);
