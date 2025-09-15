@@ -53,7 +53,7 @@ public class UsersServiceTest {
 
         ResultSet rs = mock(ResultSet.class);
         when(rs.next()).thenReturn(true);
-        when(rs.getString("passcode")).thenReturn(expectedHash);
+        when(rs.getString("password")).thenReturn(expectedHash);
 
         PreparedStatement stmt = mock(PreparedStatement.class);
         when(stmt.executeQuery()).thenReturn(rs);

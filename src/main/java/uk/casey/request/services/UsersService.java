@@ -51,7 +51,7 @@ public class UsersService implements UsersServiceInterface {
         String username = properties.getProperty("db.username");
         String password = properties.getProperty("db.password");
 
-        String sql = "SELECT COUNT(*) FROM users WHERE id = ? AND username = ?";
+        String sql = "SELECT password FROM users WHERE id = ? AND username = ?";
 
         try (Connection connection = DriverManager.getConnection(url, username, password);
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -60,7 +60,7 @@ public class UsersService implements UsersServiceInterface {
             ResultSet rs = statement.executeQuery();
 
             if (rs.next()) {
-                return rs.getString("passcode");
+                return rs.getString("password");
             }
             return null;
         }

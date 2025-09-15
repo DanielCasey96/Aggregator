@@ -1,6 +1,8 @@
 package uk.casey.request;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import com.sun.net.httpserver.HttpServer;
 
@@ -35,7 +37,7 @@ public class AggregateController {
         httpServer.createContext("/remove-product", new RemoveProductHandler(productServiceInterface, jwtUtil));
         httpServer.createContext("/register", new RegistrationHandler(usersServiceInterface));
         httpServer.createContext("/authorise", new AuthorisationHandler(usersServiceInterface));
-        httpServer.setExecutor(null);
+        httpServer.setExecutor(Executors.newFixedThreadPool(10)); // Remove if hosting on lambda
         httpServer.start();
     }
 }
