@@ -5,14 +5,18 @@ import com.sun.net.httpserver.HttpExchange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
+import org.mockito.ArgumentCaptor;
 import uk.casey.request.services.UsersServiceInterface;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -141,6 +145,83 @@ public class RegistrationHandlerTest {
         verify(exchange, never()).sendResponseHeaders(anyInt(), anyLong());
     }
 
+    @Tag("unit-integration")
+    @Test
+    void returnsHashedPasswordSuccess() throws Exception {
+        Headers headers = new Headers();
+        headers.add("Accept", "application/json");
+    String json = """
+            {
+                "username" : "boogaloo2",
+                "passcode" : "password123",
+                "email" : "clear@yahoo.com"
+            }
+            """;
+        when(exchange.getRequestMethod()).thenReturn("POST");
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/register"));
+        when(exchange.getRequestHeaders()).thenReturn(headers);
+        when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
+        when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
+
+        when(usersServiceInterface.registerWithDatabase(
+                anyString(), anyString(), anyString()
+        )).thenReturn(UUID.randomUUID());
+
+        ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
+
+        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface);
+        handler.handle(exchange);
+
+        verify(usersServiceInterface).registerWithDatabase(
+                eq("boogaloo2"),
+                passwordCaptor.capture(),
+                eq("clear@yahoo.com")
+        );
+        String actualHashedPassword = passwordCaptor.getValue();
+        assertTrue(actualHashedPassword.startsWith("$2a$"),
+                "Password should be hashed with BCrypt");
+        assertTrue(BCrypt.checkpw("password123", actualHashedPassword),
+                "BCrypt hash should verify against the original password");
+    }
+
+    @Tag("unit-integration")
+    @Test
+    void returnsHashedPasswordSuccessMultiplePasswords() throws Exception {
+        Headers headers = new Headers();
+        headers.add("Accept", "application/json");
+        String[] testPasswords = {"password", "123456", "!@#$%^&*", "", "veryLongPasswordWithSpecialChars123!@#"};
+        for (String password : testPasswords) {
+            // Reset mocks for each iteration
+            reset(exchange, usersServiceInterface);
+
+            String json = String.format(
+                    "{\"username\": \"user\", \"passcode\": \"%s\", \"email\": \"test@example.com\"}",
+                    password
+            );
+
+            when(exchange.getRequestMethod()).thenReturn("POST");
+            when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/register"));
+            when(exchange.getRequestHeaders()).thenReturn(headers);
+            when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
+            when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
+
+            when(usersServiceInterface.registerWithDatabase(
+                    anyString(), anyString(), anyString()
+            )).thenReturn(UUID.randomUUID());
+
+            ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
+
+            RegistrationHandler handler = new RegistrationHandler(usersServiceInterface);
+            handler.handle(exchange);
+
+            verify(usersServiceInterface).registerWithDatabase(anyString(), passwordCaptor.capture(), anyString());
+
+            String actualHashedPassword = passwordCaptor.getValue();
+            assertTrue(actualHashedPassword.startsWith("$2a$"));
+            assertTrue(BCrypt.checkpw(password, actualHashedPassword),
+                    String.format("BCrypt verification failed for password: %s", password));
+        }
+    }
 
     @Tag("unit-integration")
     @Test

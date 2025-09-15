@@ -46,14 +46,14 @@ public class UsersServiceTest {
     }
 
     @Test
-    void queryDataFromDatabase_success() throws Exception {
-        UUID userId = UUID.randomUUID();
+    void getHashedPasscodeFromDatabase_success() throws Exception {
+        UUID userId = UUID.fromString("3d95aaa8-a189-4f07-b3e0-734c0490b9c3");
         String customerName = "Derrick";
-        String passcode = "Sus4nB0yl3";
+        String expectedHash = "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
 
         ResultSet rs = mock(ResultSet.class);
         when(rs.next()).thenReturn(true);
-        when(rs.getInt(1)).thenReturn(1);
+        when(rs.getString("passcode")).thenReturn(expectedHash);
 
         PreparedStatement stmt = mock(PreparedStatement.class);
         when(stmt.executeQuery()).thenReturn(rs);
@@ -66,9 +66,35 @@ public class UsersServiceTest {
                     .thenReturn(conn);
 
             UsersService service = new UsersService();
-            boolean result = service.queryDataOfDatabase(userId, customerName, passcode);
+            String result = service.getStoredPassword(userId, customerName);
 
-            assertTrue(result);
+            assertEquals(expectedHash, result);
+            verify(stmt).setObject(1, userId);
+            verify(stmt).setString(2, customerName);
+        }
+    }
+
+    @Test
+    void getHashedPasscodeFromDatabase_noValue() throws Exception {
+        UUID userId = UUID.randomUUID();        String customerName = "ghost";
+
+        ResultSet rs = mock(ResultSet.class);
+        when(rs.next()).thenReturn(false);
+
+        PreparedStatement stmt = mock(PreparedStatement.class);
+        when(stmt.executeQuery()).thenReturn(rs);
+
+        Connection conn = mock(Connection.class);
+        when(conn.prepareStatement(anyString())).thenReturn(stmt);
+
+        try (MockedStatic<DriverManager> dm = mockStatic(DriverManager.class)) {
+            dm.when(() -> DriverManager.getConnection(anyString(), anyString(), anyString()))
+                    .thenReturn(conn);
+
+            UsersService service = new UsersService();
+            String result = service.getStoredPassword(userId, customerName);
+
+            assertNull(result);
         }
     }
 }

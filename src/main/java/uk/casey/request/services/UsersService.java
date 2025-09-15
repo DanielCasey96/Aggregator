@@ -39,7 +39,7 @@ public class UsersService implements UsersServiceInterface {
         }
     }
 
-    public boolean queryDataOfDatabase(UUID userId, String customerUsername, String passcode) throws IOException, SQLException {
+    public String getStoredPassword(UUID userId, String customerUsername) throws IOException, SQLException {
         System.out.println("Starting to update DB");
 
         Properties properties = new Properties();
@@ -51,23 +51,18 @@ public class UsersService implements UsersServiceInterface {
         String username = properties.getProperty("db.username");
         String password = properties.getProperty("db.password");
 
-        String sql = "SELECT COUNT(*) FROM users WHERE id = ? AND username = ? AND password = ?";
+        String sql = "SELECT COUNT(*) FROM users WHERE id = ? AND username = ?";
 
-        try(Connection connection = DriverManager.getConnection(url, username, password);
-            PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = DriverManager.getConnection(url, username, password);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setObject(1, userId);
             statement.setString(2, customerUsername);
-            statement.setString(3, passcode);
+            ResultSet rs = statement.executeQuery();
 
-            try (ResultSet rs = statement.executeQuery()) {
-                if (rs.next() && rs.getInt(1) > 0) {
-                    // Match found
-                    return true;
-                } else {
-                    // No match
-                    return false;
-                }
+            if (rs.next()) {
+                return rs.getString("passcode");
             }
+            return null;
         }
     }
 

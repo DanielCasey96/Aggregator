@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
+import org.mindrot.jbcrypt.BCrypt;
 import uk.casey.models.LoginRequestModel;
 import uk.casey.request.services.ProductService;
 import uk.casey.request.services.UsersServiceInterface;
@@ -50,7 +51,14 @@ public class AuthorisationHandler implements HttpHandler {
         }
 
         try {
-            boolean authenticated = usersServiceInterface.queryDataOfDatabase(userId, loginRequestModel.getUsername(), loginRequestModel.getPasscode());
+            String storedHash = usersServiceInterface.getStoredPassword(userId, loginRequestModel.getUsername());
+
+            if (storedHash == null) {
+                exchange.sendResponseHeaders(401, -1);
+                return;
+            }
+
+            boolean authenticated = BCrypt.checkpw(loginRequestModel.getPasscode(), storedHash);
             if (authenticated) {
                 String token = JwtUtil.generateToken(userId, loginRequestModel.getUsername());
                 exchange.sendResponseHeaders(200, token.getBytes().length);

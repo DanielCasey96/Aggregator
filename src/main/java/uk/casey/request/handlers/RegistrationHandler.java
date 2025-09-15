@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import uk.casey.models.RegistrationRequestModel;
-import uk.casey.request.services.ProductService;
-import uk.casey.request.services.ProductServiceInterface;
 import uk.casey.request.services.UsersServiceInterface;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -46,8 +45,10 @@ public class RegistrationHandler implements HttpHandler {
             return;
         }
 
+        String hashedPassword = BCrypt.hashpw(registrationRequestModel.getPasscode(), BCrypt.gensalt());
+
         try {
-            UUID userId = usersServiceInterface.registerWithDatabase(registrationRequestModel.getUsername(), registrationRequestModel.getPasscode(), registrationRequestModel.getEmail());
+            UUID userId = usersServiceInterface.registerWithDatabase(registrationRequestModel.getUsername(), hashedPassword, registrationRequestModel.getEmail());
             String response = "{\"userId\": \"" + userId + "\"}";
             exchange.sendResponseHeaders(201, response.getBytes().length);
             exchange.getResponseBody().write(response.getBytes());

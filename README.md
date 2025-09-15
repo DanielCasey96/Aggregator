@@ -1,35 +1,21 @@
+### Service Description
+This service acts as an aggregator of funds to allow for the creation, deletion, and updating of various accounts a person may have.
+Due to the contractual issues of connecting to multiple banks and finance institutions this acts as an offline type net worth tracking account.
+The user can create an account and add each of their investments and savings to then see a total net worth value.
 
-#### Connect to the DB on command line
-psql -U postgres -d customer
-#### Insert a new user
-INSERT INTO accounts (id, balance, debt, currency, lastUpdated)
-VALUES (1, 1000.00, 0.00, 'GBP', NOW());
+### Service impl
+This service intentionally doesn't use Spring for improved size, speed and the learning opportunity.
+
+### TODO
+Add DH exchange for password encryption
+Add decryption and hashing for the password to enter the DB
+Add a recovery endpoint of username, password and email
+
 #### Check the data of a user
 SELECT * FROM accounts WHERE id = 1;
 #### End DB process
 net stop postgresql-x64-15
 ### Start DB process
 pg_ctl start -D "C:\Users\danca\Development\postGres\17.2\Data" -o "-p 5433"
-
 ### Connect to it:
 psql -U postgres -p 5433
-
-### Get products
-Invoke-WebRequest -Uri "http://localhost:8080/accounts" -Headers @{"Content-Type"="application/json"}
-### Update Value of a Product
-Invoke-WebRequest -Uri "http://localhost:8080/update-value" `
->>     -Method POST `                                                                                                                                                                                                                                                                                                                                                                                                             
->>     -Headers @{"Content-Type"="application/json"} `                                                                                                                                                                                                                                                                                                                                                                            
->>     -Body '{"value":12345.67}'   
-### Add new Product
-Invoke-WebRequest -Uri "http://localhost:8080/add-product" `
->>     -Method POST `                                                                                                                                                                                                                                                                                                                                                                                                             
->>     -Headers @{"Content-Type"="application/json"} `                                                                                                                                                                                                                                                                                                                                                                            
->>     -Body '{                                                                                                                                                                                                                                                                                                                                                                                                                   
->>         "name": "Example Name",                                                                                                                                                                                                                                                                                                                                                                                                
->>         "type": "Example Type",                                                                                                                                                                                                                                                                                                                                                                                                
->>         "provider": "Example Provider",                                                                                                                                                                                                                                                                                                                                                                                        
->>         "category": null,                                                                                                                                                                                                                                                                                                                                                                                                      
->>         "value": 12345.67,                                                                                                                                                                                                                                                                                                                                                                                                     
->>         "updatedAt": "2024-06-10T12:34:56.000Z"                                                                                                                                                                                                                                                                                                                                                                                
->>     }'       

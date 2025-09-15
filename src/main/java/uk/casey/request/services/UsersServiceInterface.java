@@ -8,6 +8,6 @@ public interface UsersServiceInterface {
 
     UUID registerWithDatabase(String customerUsername, String passcode, String email) throws IOException, SQLException;
 
-    boolean queryDataOfDatabase(UUID userId, String customerUsername, String passcode) throws IOException, SQLException;
+    String getStoredPassword(UUID userId, String customerUsername) throws IOException, SQLException;
 
 }

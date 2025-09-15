@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 import uk.casey.request.services.UsersServiceInterface;
 
 import java.io.IOException;
@@ -33,6 +34,7 @@ public class AuthorisationHandlerTest {
         Headers headers = new Headers();
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Content-Type", "application/json");
+        String storedHash = BCrypt.hashpw("fatty", BCrypt.gensalt());
 
         String json = """
                 {
@@ -47,9 +49,9 @@ public class AuthorisationHandlerTest {
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
 
-        when(usersServiceInterface.queryDataOfDatabase(
-                any(UUID.class), anyString(), anyString()
-        )).thenReturn(true);
+        when(usersServiceInterface.getStoredPassword(
+                any(UUID.class), anyString()
+        )).thenReturn(storedHash);
 
         AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface);
         handler.handle(exchange);
@@ -65,6 +67,7 @@ public class AuthorisationHandlerTest {
         Headers headers = new Headers();
         headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Content-Type", "application/json");
+        String storedHash = BCrypt.hashpw("fatty", BCrypt.gensalt());
 
         String json = """
                 {
@@ -80,9 +83,9 @@ public class AuthorisationHandlerTest {
         OutputStream responseBody = mock(OutputStream.class);
         when(exchange.getResponseBody()).thenReturn(responseBody);
 
-        when(usersServiceInterface.queryDataOfDatabase(
-                any(UUID.class), anyString(), anyString()
-        )).thenReturn(true);
+        when(usersServiceInterface.getStoredPassword(
+                any(UUID.class), anyString()
+        )).thenReturn(storedHash);
 
         AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface);
         handler.handle(exchange);
@@ -181,8 +184,8 @@ public class AuthorisationHandlerTest {
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
-        doThrow(new IOException("DB error IO")).when(usersServiceInterface).queryDataOfDatabase(
-                any(UUID.class), anyString(), anyString()
+        doThrow(new IOException("DB error IO")).when(usersServiceInterface).getStoredPassword(
+                any(UUID.class), anyString()
         );
 
         AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface);
@@ -210,8 +213,8 @@ public class AuthorisationHandlerTest {
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
-        doThrow(new SQLException("DB error IO")).when(usersServiceInterface).queryDataOfDatabase(
-                any(UUID.class), anyString(), anyString()
+        doThrow(new SQLException("DB error IO")).when(usersServiceInterface).getStoredPassword(
+                any(UUID.class), anyString()
         );
 
         AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface);
