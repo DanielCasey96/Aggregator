@@ -16,11 +16,9 @@ import uk.casey.utils.JwtUtil;
 public class UpdateProductHandler implements HttpHandler {
 
     private final ProductServiceInterface productServiceInterface;
-    private final JwtUtil jwtUtil;
 
-    public UpdateProductHandler(ProductServiceInterface productServiceInterface, JwtUtil jwtUtil) {
+    public UpdateProductHandler(ProductServiceInterface productServiceInterface) {
         this.productServiceInterface = productServiceInterface;
-        this.jwtUtil = jwtUtil;
     }
 
     @Override

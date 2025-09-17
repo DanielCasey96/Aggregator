@@ -49,7 +49,7 @@ public class RemoveProductHandlerTest {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
 
-            RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
+            RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface);
             handler.handle(exchange);
 
             verify(exchange).getRequestMethod();
@@ -77,7 +77,7 @@ public class RemoveProductHandlerTest {
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
+            RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface);
             handler.handle(exchange);
 
             verify(responseBody).flush();
@@ -90,7 +90,7 @@ public class RemoveProductHandlerTest {
     void returns405ForNonDeleteMethod() throws Exception {
         when(exchange.getRequestMethod()).thenReturn("POST");
 
-        RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
+        RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -107,7 +107,7 @@ public class RemoveProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("DELETE");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
+        RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -123,7 +123,7 @@ public class RemoveProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("DELETE");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
+        RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -138,7 +138,7 @@ public class RemoveProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("DELETE");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
+        RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -154,7 +154,7 @@ public class RemoveProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("DELETE");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
+        RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -204,7 +204,7 @@ public class RemoveProductHandlerTest {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
 
-            RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
+            RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface);
             handler.handle(exchange);
 
             verify(exchange).sendResponseHeaders(500, -1);
@@ -230,7 +230,7 @@ public class RemoveProductHandlerTest {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
 
-            RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface, jwtUtil);
+            RemoveProductHandler handler = new RemoveProductHandler(productServiceInterface);
             handler.handle(exchange);
 
             verify(exchange).sendResponseHeaders(500, -1);

@@ -1,7 +1,6 @@
 package uk.casey.request;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import com.sun.net.httpserver.HttpServer;
@@ -20,21 +19,15 @@ import uk.casey.utils.JwtUtil;
 
 public class AggregateController {
 
-    private final HttpServer httpServer;
-    private final ProductServiceInterface productServiceInterface;
-    private final UsersServiceInterface usersServiceInterface;
-    private final JwtUtil jwtUtil;
-
     public AggregateController() throws Exception {
-        this.productServiceInterface = new ProductService();
-        this.usersServiceInterface = new UsersService();
-        this.jwtUtil = new JwtUtil();
+        ProductServiceInterface productServiceInterface = new ProductService();
+        UsersServiceInterface usersServiceInterface = new UsersService();
 
-        httpServer = HttpServer.create(new InetSocketAddress("localhost", 8080), 0);
-        httpServer.createContext("/add-product", new NewProductHandler(productServiceInterface, jwtUtil));
-        httpServer.createContext("/accounts", new RetrievalHandler(productServiceInterface, jwtUtil));
-        httpServer.createContext("/update-value", new UpdateProductHandler(productServiceInterface, jwtUtil));
-        httpServer.createContext("/remove-product", new RemoveProductHandler(productServiceInterface, jwtUtil));
+        HttpServer httpServer = HttpServer.create(new InetSocketAddress("localhost", 8080), 0);
+        httpServer.createContext("/add-product", new NewProductHandler(productServiceInterface));
+        httpServer.createContext("/accounts", new RetrievalHandler(productServiceInterface));
+        httpServer.createContext("/update-value", new UpdateProductHandler(productServiceInterface));
+        httpServer.createContext("/remove-product", new RemoveProductHandler(productServiceInterface));
         httpServer.createContext("/register", new RegistrationHandler(usersServiceInterface));
         httpServer.createContext("/authorise", new AuthorisationHandler(usersServiceInterface));
         httpServer.setExecutor(Executors.newFixedThreadPool(10)); // Remove if hosting on lambda

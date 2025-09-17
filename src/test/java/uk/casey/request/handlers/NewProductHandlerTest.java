@@ -80,7 +80,7 @@ public class NewProductHandlerTest {
                     any(BigDecimal.class), any(Timestamp.class)
             )).thenReturn(true);
 
-            NewProductHandler handler = new NewProductHandler(productServiceInterface, jwtUtil);
+            NewProductHandler handler = new NewProductHandler(productServiceInterface);
             handler.handle(exchange);
 
             verify(exchange).getRequestMethod();
@@ -126,7 +126,7 @@ public class NewProductHandlerTest {
                     any(BigDecimal.class), any(Timestamp.class)
             )).thenReturn(true);
 
-            NewProductHandler handler = new NewProductHandler(productServiceInterface, jwtUtil);
+            NewProductHandler handler = new NewProductHandler(productServiceInterface);
             handler.handle(exchange);
 
             verify(responseBody).flush();
@@ -139,7 +139,7 @@ public class NewProductHandlerTest {
     void returns405ForNonPostMethod() throws Exception {
         when(exchange.getRequestMethod()).thenReturn("GET");
 
-        NewProductHandler handler = new NewProductHandler(productServiceInterface, jwtUtil);
+        NewProductHandler handler = new NewProductHandler(productServiceInterface);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -156,7 +156,7 @@ public class NewProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        NewProductHandler handler = new NewProductHandler(productServiceInterface, jwtUtil);
+        NewProductHandler handler = new NewProductHandler(productServiceInterface);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -172,7 +172,7 @@ public class NewProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        NewProductHandler handler = new NewProductHandler(productServiceInterface, jwtUtil);
+        NewProductHandler handler = new NewProductHandler(productServiceInterface);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -187,7 +187,7 @@ public class NewProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        NewProductHandler handler = new NewProductHandler(productServiceInterface, jwtUtil);
+        NewProductHandler handler = new NewProductHandler(productServiceInterface);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -203,7 +203,7 @@ public class NewProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        NewProductHandler handler = new NewProductHandler(productServiceInterface, jwtUtil);
+        NewProductHandler handler = new NewProductHandler(productServiceInterface);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -259,7 +259,7 @@ public class NewProductHandlerTest {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
 
-            NewProductHandler handler = new NewProductHandler(productServiceInterface, jwtUtil);
+            NewProductHandler handler = new NewProductHandler(productServiceInterface);
             handler.handle(exchange);
 
             verify(exchange).sendResponseHeaders(500, -1);
@@ -300,7 +300,7 @@ public class NewProductHandlerTest {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
 
-            NewProductHandler handler = new NewProductHandler(productServiceInterface, jwtUtil);
+            NewProductHandler handler = new NewProductHandler(productServiceInterface);
             handler.handle(exchange);
 
             verify(exchange).sendResponseHeaders(500, -1);

@@ -16,11 +16,9 @@ import uk.casey.utils.JwtUtil;
 public class RetrievalHandler implements HttpHandler {
 
     private final ProductServiceInterface productServiceInterface;
-    private final JwtUtil jwtUtil;
 
-    public RetrievalHandler(ProductServiceInterface productServiceInterface, JwtUtil jwtUtil) {
+    public RetrievalHandler(ProductServiceInterface productServiceInterface) {
         this.productServiceInterface = productServiceInterface;
-        this.jwtUtil = jwtUtil;
     }
     
     @Override

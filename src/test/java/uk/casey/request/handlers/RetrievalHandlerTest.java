@@ -48,7 +48,7 @@ public class RetrievalHandlerTest {
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
+            RetrievalHandler handler = new RetrievalHandler(productServiceInterface);
             handler.handle(exchange);
 
             verify(exchange).getRequestMethod();
@@ -74,7 +74,7 @@ public class RetrievalHandlerTest {
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
+            RetrievalHandler handler = new RetrievalHandler(productServiceInterface);
             handler.handle(exchange);
 
             verify(responseBody).flush();
@@ -87,7 +87,7 @@ public class RetrievalHandlerTest {
     void returns405ForNonGetMethod() throws Exception {
         when(exchange.getRequestMethod()).thenReturn("POST");
 
-        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
+        RetrievalHandler handler = new RetrievalHandler(productServiceInterface);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -104,7 +104,7 @@ public class RetrievalHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
+        RetrievalHandler handler = new RetrievalHandler(productServiceInterface);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -120,7 +120,7 @@ public class RetrievalHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
+        RetrievalHandler handler = new RetrievalHandler(productServiceInterface);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -134,7 +134,7 @@ public class RetrievalHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
+        RetrievalHandler handler = new RetrievalHandler(productServiceInterface);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -150,7 +150,7 @@ public class RetrievalHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
+        RetrievalHandler handler = new RetrievalHandler(productServiceInterface);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -189,7 +189,7 @@ public class RetrievalHandlerTest {
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
+            RetrievalHandler handler = new RetrievalHandler(productServiceInterface);
             handler.handle(exchange);
 
             verify(exchange).sendResponseHeaders(500, -1);
@@ -214,7 +214,7 @@ public class RetrievalHandlerTest {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
 
-            RetrievalHandler handler = new RetrievalHandler(productServiceInterface, jwtUtil);
+            RetrievalHandler handler = new RetrievalHandler(productServiceInterface);
             handler.handle(exchange);
 
             verify(exchange).sendResponseHeaders(500, -1);
