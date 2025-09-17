@@ -7,8 +7,8 @@ import java.util.UUID;
 
 public interface UsersServiceInterface {
 
-    UUID registerWithDatabase(String customerUsername, String passcode, String email, Properties properties) throws IOException, SQLException;
+    UUID registerWithDatabase(String customerUsername, String passcode, String email) throws IOException, SQLException;
 
-    String getStoredPassword(UUID userId, String customerUsername, Properties properties) throws IOException, SQLException;
+    String getStoredPassword(UUID userId, String customerUsername) throws IOException, SQLException;
 
 }

@@ -15,12 +15,10 @@ import uk.casey.utils.JwtUtil;
 public class NewProductHandler implements HttpHandler {
 
     private final ProductServiceInterface productServiceInterface;
-    private final Properties properties;
     private final ObjectMapper objectMapper;
 
-    public NewProductHandler(ProductServiceInterface productServiceInterface, Properties properties, ObjectMapper objectMapper) {
+    public NewProductHandler(ProductServiceInterface productServiceInterface, ObjectMapper objectMapper) {
         this.productServiceInterface = productServiceInterface;
-        this.properties = properties;
         this.objectMapper = objectMapper;
     }
 
@@ -52,7 +50,7 @@ public class NewProductHandler implements HttpHandler {
         prm  = HandlerHelper.parseRequestBody(exchange, objectMapper, ProductRequestModel.class);
 
         try {
-            productServiceInterface.createProductInDatabase(prm.getUserId(), prm.getName(), prm.getType(), prm.getProvider(), prm.getCategory(), prm.getValue(), prm.getUpdatedAt(), properties);
+            productServiceInterface.createProductInDatabase(prm.getUserId(), prm.getName(), prm.getType(), prm.getProvider(), prm.getCategory(), prm.getValue(), prm.getUpdatedAt());
             exchange.sendResponseHeaders(201, -1);
             exchange.getResponseBody().flush();
             exchange.getResponseBody().close();

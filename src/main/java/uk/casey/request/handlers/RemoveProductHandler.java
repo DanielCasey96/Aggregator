@@ -14,11 +14,9 @@ import uk.casey.utils.JwtUtil;
 public class RemoveProductHandler implements HttpHandler {
 
     private final ProductServiceInterface productServiceInterface;
-    private final Properties properties;
 
-    public RemoveProductHandler(ProductServiceInterface productServiceInterface, Properties properties) {
+    public RemoveProductHandler(ProductServiceInterface productServiceInterface) {
         this.productServiceInterface = productServiceInterface;
-        this.properties = properties;
     }
 
      @Override
@@ -48,7 +46,7 @@ public class RemoveProductHandler implements HttpHandler {
          }
 
          try {
-             productServiceInterface.removeProductFromDatabase(userId, id, properties);
+             productServiceInterface.removeProductFromDatabase(userId, id);
              exchange.sendResponseHeaders(204, -1);
              exchange.getResponseBody().flush();
              exchange.getResponseBody().close();

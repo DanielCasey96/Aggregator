@@ -49,8 +49,8 @@ public class ProductServiceTest {
             dm.when(() -> DriverManager.getConnection(anyString(), anyString(), anyString()))
             .thenReturn(conn);
 
-            ProductService service = new ProductService();
-            List<ProductsTableResponseModel> products = service.retrieveProductsFromDatabase(userId, properties);
+            ProductService service = new ProductService(properties);
+            List<ProductsTableResponseModel> products = service.retrieveProductsFromDatabase(userId);
 
             assertNotNull(products);
             assertEquals(1, products.size());
@@ -79,8 +79,8 @@ public class ProductServiceTest {
             dm.when(() -> DriverManager.getConnection(anyString(), anyString(), anyString()))
                     .thenReturn(conn);
 
-            ProductService service = new ProductService();
-            boolean result = service.updateProductToDatabase(value, id, userId, properties);
+            ProductService service = new ProductService(properties);
+            boolean result = service.updateProductToDatabase(value, id, userId);
 
             assertTrue(result);
         }
@@ -111,8 +111,8 @@ public class ProductServiceTest {
             dm.when(() -> DriverManager.getConnection(anyString(), anyString(), anyString()))
                     .thenReturn(conn);
 
-            ProductService service = new ProductService();
-            boolean result = service.createProductInDatabase(userId, name, type, provider, category, value, updated_at, properties);
+            ProductService service = new ProductService(properties);
+            boolean result = service.createProductInDatabase(userId, name, type, provider, category, value, updated_at);
 
             assertTrue(result);
         }
@@ -138,8 +138,8 @@ public class ProductServiceTest {
             dm.when(() -> DriverManager.getConnection(anyString(), anyString(), anyString()))
                     .thenReturn(conn);
 
-            ProductService service = new ProductService();
-            boolean result = service.removeProductFromDatabase(userId, id, properties);
+            ProductService service = new ProductService(properties);
+            boolean result = service.removeProductFromDatabase(userId, id);
 
             assertTrue(result);
         }

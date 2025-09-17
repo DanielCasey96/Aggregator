@@ -17,18 +17,22 @@ import java.util.UUID;
 import uk.casey.models.ProductsTableResponseModel;
 
 public class ProductService implements ProductServiceInterface {
+    private final String url;
+    private final String username;
+    private final String password;
 
-    @Override
-    public List<ProductsTableResponseModel> retrieveProductsFromDatabase(UUID userId, Properties properties) throws IOException, SQLException {
-        System.out.println("Starting to gather data from DB");
+    public ProductService(Properties properties) throws IOException {
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
             properties.load(input);
         }
+        this.url = properties.getProperty("db.url");
+        this.username = properties.getProperty("db.username");
+        this.password = properties.getProperty("db.password");
+    }
 
-        String url = properties.getProperty("db.url");
-        String username = properties.getProperty("db.username");
-        String password = properties.getProperty("db.password");
-
+    @Override
+    public List<ProductsTableResponseModel> retrieveProductsFromDatabase(UUID userId) throws IOException, SQLException {
+        System.out.println("Starting to gather data from DB");
         String sql = "SELECT id, name, type, provider, value, category, updated_at FROM products WHERE user_id = ?";
 
         List<ProductsTableResponseModel> products = new ArrayList<>();
@@ -54,17 +58,8 @@ public class ProductService implements ProductServiceInterface {
     }
 
     @Override
-    public boolean updateProductToDatabase(BigDecimal newValue, int id, UUID userId, Properties properties) throws IOException, SQLException{
+    public boolean updateProductToDatabase(BigDecimal newValue, int id, UUID userId) throws IOException, SQLException{
         System.out.println("Starting to update DB");
-
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
-            properties.load(input);
-        }
-
-        String url = properties.getProperty("db.url");
-        String username = properties.getProperty("db.username");
-        String password = properties.getProperty("db.password");
-
         String sql = "UPDATE products SET value = ? WHERE id = ? AND user_id = ?";
 
         try (Connection connection = DriverManager.getConnection(url, username, password);
@@ -79,17 +74,8 @@ public class ProductService implements ProductServiceInterface {
     }
 
     @Override
-    public boolean createProductInDatabase(UUID userId, String name, String type, String provider, String category, BigDecimal value, Timestamp updated_at, Properties properties) throws IOException, SQLException{
+    public boolean createProductInDatabase(UUID userId, String name, String type, String provider, String category, BigDecimal value, Timestamp updated_at) throws IOException, SQLException{
         System.out.println("Starting to update DB");
-
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
-            properties.load(input);
-        }
-
-        String url = properties.getProperty("db.url");
-        String username = properties.getProperty("db.username");
-        String password = properties.getProperty("db.password");
-
         String sql = "INSERT INTO products (user_id, name, type, provider, category, value, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)"; 
 
         try (Connection connection = DriverManager.getConnection(url, username, password);
@@ -108,17 +94,8 @@ public class ProductService implements ProductServiceInterface {
     }
 
     @Override
-    public boolean removeProductFromDatabase(UUID userId, int id, Properties properties) throws IOException, SQLException {
+    public boolean removeProductFromDatabase(UUID userId, int id) throws IOException, SQLException {
         System.out.println("Starting to update DB");
-
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
-            properties.load(input);
-        }
-
-        String url = properties.getProperty("db.url");
-        String username = properties.getProperty("db.username");
-        String password = properties.getProperty("db.password");
-
         String sql = "DELETE FROM products WHERE id = ? AND user_id = ?";
 
         try (Connection connection = DriverManager.getConnection(url, username, password);

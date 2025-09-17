@@ -18,12 +18,10 @@ import uk.casey.utils.JwtUtil;
 public class AuthorisationHandler implements HttpHandler {
 
     private final UsersServiceInterface usersServiceInterface;
-    private final Properties properties;
     private final ObjectMapper objectMapper;
 
-    public AuthorisationHandler(UsersServiceInterface usersServiceInterface, Properties properties, ObjectMapper objectMapper) {
+    public AuthorisationHandler(UsersServiceInterface usersServiceInterface, ObjectMapper objectMapper) {
         this.usersServiceInterface = usersServiceInterface;
-        this.properties = properties;
         this.objectMapper = objectMapper;
     }
 
@@ -55,7 +53,7 @@ public class AuthorisationHandler implements HttpHandler {
         }
 
         try {
-            String storedHash = usersServiceInterface.getStoredPassword(userId, loginRequestModel.getUsername(), properties);
+            String storedHash = usersServiceInterface.getStoredPassword(userId, loginRequestModel.getUsername());
 
             if (storedHash == null) {
                 exchange.sendResponseHeaders(401, -1);

@@ -7,18 +7,22 @@ import java.util.Properties;
 import java.util.UUID;
 
 public class UsersService implements UsersServiceInterface {
+    private final String url;
+    private final String username;
+    private final String password;
 
-    public UUID registerWithDatabase(String customerUsername, String passcode, String email, Properties properties) throws IOException, SQLException {
-        System.out.println("Starting to update DB");
-
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
+    public UsersService(Properties properties) throws IOException {
+    try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
             properties.load(input);
         }
+        this.url = properties.getProperty("db.url");
+        this.username = properties.getProperty("db.username");
+        this.password = properties.getProperty("db.password");
+    }
 
-        String url = properties.getProperty("db.url");
-        String username = properties.getProperty("db.username");
-        String password = properties.getProperty("db.password");
 
+    public UUID registerWithDatabase(String customerUsername, String passcode, String email) throws IOException, SQLException {
+        System.out.println("Starting to update DB");
         String sql = "INSERT INTO users (username, password, email) VALUES (?, ?, ?) RETURNING id";
 
         try (Connection connection = DriverManager.getConnection(url, username, password);
@@ -38,17 +42,8 @@ public class UsersService implements UsersServiceInterface {
         }
     }
 
-    public String getStoredPassword(UUID userId, String customerUsername, Properties properties) throws IOException, SQLException {
+    public String getStoredPassword(UUID userId, String customerUsername) throws IOException, SQLException {
         System.out.println("Starting to update DB");
-
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
-            properties.load(input);
-        }
-
-        String url = properties.getProperty("db.url");
-        String username = properties.getProperty("db.username");
-        String password = properties.getProperty("db.password");
-
         String sql = "SELECT password FROM users WHERE id = ? AND username = ?";
 
         try (Connection connection = DriverManager.getConnection(url, username, password);

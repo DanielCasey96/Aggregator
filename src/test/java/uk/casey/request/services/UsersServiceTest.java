@@ -43,8 +43,8 @@ public class UsersServiceTest {
             dm.when(() -> DriverManager.getConnection(anyString(), anyString(), anyString()))
                     .thenReturn(conn);
 
-            UsersService service = new UsersService();
-            UUID returnedUserId = service.registerWithDatabase(customerName, passcode, email, properties);
+            UsersService service = new UsersService(properties);
+            UUID returnedUserId = service.registerWithDatabase(customerName, passcode, email);
 
             assertNotNull(returnedUserId);
             assertEquals(expectedUserId, returnedUserId);
@@ -76,8 +76,8 @@ public class UsersServiceTest {
             dm.when(() -> DriverManager.getConnection(anyString(), anyString(), anyString()))
                     .thenReturn(conn);
 
-            UsersService service = new UsersService();
-            String result = service.getStoredPassword(userId, customerName, properties);
+            UsersService service = new UsersService(properties);
+            String result = service.getStoredPassword(userId, customerName);
 
             assertEquals(expectedHash, result);
             verify(stmt).setObject(1, userId);
@@ -108,8 +108,8 @@ public class UsersServiceTest {
             dm.when(() -> DriverManager.getConnection(anyString(), anyString(), anyString()))
                     .thenReturn(conn);
 
-            UsersService service = new UsersService();
-            String result = service.getStoredPassword(userId, customerName, properties);
+            UsersService service = new UsersService(properties);
+            String result = service.getStoredPassword(userId, customerName);
 
             assertNull(result);
         }

@@ -1,5 +1,6 @@
 package uk.casey.request;
 
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.util.Properties;
 import java.util.concurrent.Executors;
@@ -22,18 +23,21 @@ import uk.casey.utils.JwtUtil;
 public class AggregateController {
 
     public AggregateController() throws Exception {
-        ProductServiceInterface productServiceInterface = new ProductService();
-        UsersServiceInterface usersServiceInterface = new UsersService();
         Properties properties = new Properties();
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
+            properties.load(input);
+        }
+        ProductServiceInterface productServiceInterface = new ProductService(properties);
+        UsersServiceInterface usersServiceInterface = new UsersService(properties);
         ObjectMapper objectMapper = new ObjectMapper();
 
         HttpServer httpServer = HttpServer.create(new InetSocketAddress("localhost", 8080), 0);
-        httpServer.createContext("/add-product", new NewProductHandler(productServiceInterface, properties, objectMapper));
-        httpServer.createContext("/accounts", new RetrievalHandler(productServiceInterface, properties, objectMapper));
-        httpServer.createContext("/update-value", new UpdateProductHandler(productServiceInterface, properties, objectMapper));
-        httpServer.createContext("/remove-product", new RemoveProductHandler(productServiceInterface, properties));
-        httpServer.createContext("/register", new RegistrationHandler(usersServiceInterface, properties, objectMapper));
-        httpServer.createContext("/authorise", new AuthorisationHandler(usersServiceInterface, properties, objectMapper));
+        httpServer.createContext("/add-product", new NewProductHandler(productServiceInterface, objectMapper));
+        httpServer.createContext("/accounts", new RetrievalHandler(productServiceInterface, objectMapper));
+        httpServer.createContext("/update-value", new UpdateProductHandler(productServiceInterface, objectMapper));
+        httpServer.createContext("/remove-product", new RemoveProductHandler(productServiceInterface));
+        httpServer.createContext("/register", new RegistrationHandler(usersServiceInterface, objectMapper));
+        httpServer.createContext("/authorise", new AuthorisationHandler(usersServiceInterface , objectMapper));
         httpServer.setExecutor(Executors.newFixedThreadPool(10)); // Remove if hosting on lambda
         httpServer.start();
     }

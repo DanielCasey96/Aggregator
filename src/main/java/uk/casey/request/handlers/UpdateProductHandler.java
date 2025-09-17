@@ -17,12 +17,10 @@ import uk.casey.utils.JwtUtil;
 public class UpdateProductHandler implements HttpHandler {
 
     private final ProductServiceInterface productServiceInterface;
-    private final Properties properties;
     private final ObjectMapper objectMapper;
 
-    public UpdateProductHandler(ProductServiceInterface productServiceInterface, Properties properties, ObjectMapper objectMapper) {
+    public UpdateProductHandler(ProductServiceInterface productServiceInterface, ObjectMapper objectMapper) {
         this.productServiceInterface = productServiceInterface;
-        this.properties = properties;
         this.objectMapper = objectMapper;
     }
 
@@ -66,7 +64,7 @@ public class UpdateProductHandler implements HttpHandler {
         }
 
         try {
-            productServiceInterface.updateProductToDatabase(newValue, id, userId, properties);
+            productServiceInterface.updateProductToDatabase(newValue, id, userId);
             exchange.sendResponseHeaders(204, -1);
             exchange.getResponseBody().flush();
             exchange.getResponseBody().close();

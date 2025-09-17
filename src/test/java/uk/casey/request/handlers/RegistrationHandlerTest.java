@@ -29,14 +29,12 @@ public class RegistrationHandlerTest {
 
     private HttpExchange exchange;
     private UsersServiceInterface usersServiceInterface;
-    private Properties properties;
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         exchange = mock(HttpExchange.class);
         usersServiceInterface = mock(UsersServiceInterface.class);
-        properties = mock(Properties.class);
         objectMapper = mock(ObjectMapper.class);
     }
 
@@ -66,10 +64,10 @@ public class RegistrationHandlerTest {
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
 
         when(usersServiceInterface.registerWithDatabase(
-                anyString(), anyString(), anyString(), any(Properties.class)
+                anyString(), anyString(), anyString()
         )).thenReturn(UUID.randomUUID());
 
-        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
+        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -104,10 +102,10 @@ public class RegistrationHandlerTest {
         when(exchange.getResponseBody()).thenReturn(responseBody);
 
         when(usersServiceInterface.registerWithDatabase(
-                anyString(), anyString(), anyString(), any(Properties.class)
+                anyString(), anyString(), anyString()
         )).thenReturn(UUID.randomUUID());
 
-        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
+        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(responseBody).flush();
@@ -119,7 +117,7 @@ public class RegistrationHandlerTest {
     void returns405ForNonPostMethod() throws Exception {
         when(exchange.getRequestMethod()).thenReturn("GET");
 
-        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
+        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -134,7 +132,7 @@ public class RegistrationHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
+        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -148,7 +146,7 @@ public class RegistrationHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
+        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -188,20 +186,18 @@ public class RegistrationHandlerTest {
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
 
         when(usersServiceInterface.registerWithDatabase(
-                anyString(), anyString(), anyString(), any(Properties.class)
+                anyString(), anyString(), anyString()
         )).thenReturn(UUID.randomUUID());
 
         ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
 
-        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
+        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(usersServiceInterface).registerWithDatabase(
                 eq("boogaloo2"),
                 passwordCaptor.capture(),
-                eq("clear@yahoo.com"),
-                eq(properties)
-        );
+                eq("clear@yahoo.com"));
         String actualHashedPassword = passwordCaptor.getValue();
         assertTrue(actualHashedPassword.startsWith("$2a$"),
                 "Password should be hashed with BCrypt");
@@ -236,15 +232,15 @@ public class RegistrationHandlerTest {
             when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
 
             when(usersServiceInterface.registerWithDatabase(
-                    anyString(), anyString(), anyString(), any(Properties.class)
+                    anyString(), anyString(), anyString()
             )).thenReturn(UUID.randomUUID());
 
             ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
 
-            RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
+            RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, objectMapper);
             handler.handle(exchange);
 
-            verify(usersServiceInterface).registerWithDatabase(anyString(), passwordCaptor.capture(), anyString(), any(Properties.class));
+            verify(usersServiceInterface).registerWithDatabase(anyString(), passwordCaptor.capture(), anyString());
 
             String actualHashedPassword = passwordCaptor.getValue();
             assertTrue(actualHashedPassword.startsWith("$2a$"));
@@ -278,10 +274,10 @@ public class RegistrationHandlerTest {
                         "clear@yahoo.com"));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
         doThrow(new IOException("DB error IO")).when(usersServiceInterface).registerWithDatabase(
-                anyString(), anyString(), anyString(), any(Properties.class)
+                anyString(), anyString(), anyString()
         );
 
-        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
+        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(500, -1);
@@ -312,10 +308,10 @@ public class RegistrationHandlerTest {
                         "clear@yahoo.com"));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
         doThrow(new SQLException("DB error IO")).when(usersServiceInterface).registerWithDatabase(
-                anyString(), anyString(), anyString(), any(Properties.class)
+                anyString(), anyString(), anyString()
         );
 
-        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
+        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(500, -1);

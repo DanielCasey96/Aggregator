@@ -17,12 +17,10 @@ import uk.casey.utils.JwtUtil;
 public class RetrievalHandler implements HttpHandler {
 
     private final ProductServiceInterface productServiceInterface;
-    private final Properties properties;
     private final ObjectMapper objectMapper;
 
-    public RetrievalHandler(ProductServiceInterface productServiceInterface, Properties properties, ObjectMapper objectMapper) {
+    public RetrievalHandler(ProductServiceInterface productServiceInterface, ObjectMapper objectMapper) {
         this.productServiceInterface = productServiceInterface;
-        this.properties = properties;
         this.objectMapper = objectMapper;
     }
     
@@ -53,7 +51,7 @@ public class RetrievalHandler implements HttpHandler {
         // Make GET call to DB to determine current state of Data
         List<ProductsTableResponseModel> dbResponse; 
         try {
-            dbResponse = productServiceInterface.retrieveProductsFromDatabase(userId, properties);
+            dbResponse = productServiceInterface.retrieveProductsFromDatabase(userId);
             String response = objectMapper.writeValueAsString(dbResponse);
             exchange.sendResponseHeaders(200, response.length());
             exchange.getResponseBody().write(response.getBytes());

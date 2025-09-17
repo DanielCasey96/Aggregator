@@ -24,14 +24,12 @@ public class AuthorisationHandlerTest {
 
     private HttpExchange exchange;
     private UsersServiceInterface usersServiceInterface;
-    private Properties properties;
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         exchange = mock(HttpExchange.class);
         usersServiceInterface = mock(UsersServiceInterface.class);
-        properties = mock(Properties.class);
         objectMapper = mock(ObjectMapper.class);
     }
 
@@ -59,10 +57,10 @@ public class AuthorisationHandlerTest {
                 .thenReturn(new LoginRequestModel("casey2boogaloo", "fatty"));
 
         when(usersServiceInterface.getStoredPassword(
-                any(UUID.class), anyString(), any(Properties.class)
+                any(UUID.class), anyString()
         )).thenReturn(storedHash);
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties, objectMapper);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -95,10 +93,10 @@ public class AuthorisationHandlerTest {
                 .thenReturn(new LoginRequestModel("casey2boogaloo", "fatty"));
 
         when(usersServiceInterface.getStoredPassword(
-                any(UUID.class), anyString(), any(Properties.class)
+                any(UUID.class), anyString()
         )).thenReturn(storedHash);
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties, objectMapper);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(responseBody).flush();
@@ -110,7 +108,7 @@ public class AuthorisationHandlerTest {
     void returns405ForNonPostMethod() throws Exception {
         when(exchange.getRequestMethod()).thenReturn("GET");
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties, objectMapper);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -126,7 +124,7 @@ public class AuthorisationHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties, objectMapper);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -141,7 +139,7 @@ public class AuthorisationHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties, objectMapper);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -155,7 +153,7 @@ public class AuthorisationHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties, objectMapper);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -170,7 +168,7 @@ public class AuthorisationHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties, objectMapper);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -198,10 +196,10 @@ public class AuthorisationHandlerTest {
         when(objectMapper.readValue(anyString(), eq(LoginRequestModel.class)))
                 .thenReturn(new LoginRequestModel("casey2boogaloo", "fatty"));
         doThrow(new IOException("DB error IO")).when(usersServiceInterface).getStoredPassword(
-                any(UUID.class), anyString(), any(Properties.class)
+                any(UUID.class), anyString()
         );
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties, objectMapper);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(500, -1);
@@ -229,10 +227,10 @@ public class AuthorisationHandlerTest {
         when(objectMapper.readValue(anyString(), eq(LoginRequestModel.class)))
                 .thenReturn(new LoginRequestModel("casey2boogaloo", "fatty"));
         doThrow(new SQLException("DB error IO")).when(usersServiceInterface).getStoredPassword(
-                any(UUID.class), anyString(), any(Properties.class)
+                any(UUID.class), anyString()
         );
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties, objectMapper);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(500, -1);
