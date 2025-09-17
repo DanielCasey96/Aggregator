@@ -8,7 +8,6 @@ import java.util.UUID;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-import uk.casey.request.services.ProductService;
 import uk.casey.request.services.ProductServiceInterface;
 import uk.casey.utils.JwtUtil;
 

@@ -16,15 +16,16 @@ public class NewProductHandler implements HttpHandler {
 
     private final ProductServiceInterface productServiceInterface;
     private final Properties properties;
+    private final ObjectMapper objectMapper;
 
-    public NewProductHandler(ProductServiceInterface productServiceInterface, Properties properties) {
+    public NewProductHandler(ProductServiceInterface productServiceInterface, Properties properties, ObjectMapper objectMapper) {
         this.productServiceInterface = productServiceInterface;
         this.properties = properties;
+        this.objectMapper = objectMapper;
     }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
         ProductRequestModel prm;
 
         if (!"POST".equals(exchange.getRequestMethod())) {

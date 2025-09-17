@@ -16,15 +16,16 @@ public class RegistrationHandler implements HttpHandler {
 
     private final UsersServiceInterface usersServiceInterface;
     private final Properties properties;
+    private final ObjectMapper objectMapper;
 
-    public RegistrationHandler(UsersServiceInterface usersServiceInterface, Properties properties) {
+    public RegistrationHandler(UsersServiceInterface usersServiceInterface, Properties properties, ObjectMapper objectMapper) {
         this.usersServiceInterface = usersServiceInterface;
         this.properties = properties;
+        this.objectMapper = objectMapper;
     }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
         RegistrationRequestModel registrationRequestModel;
 
         if (!"POST".equals(exchange.getRequestMethod())) {

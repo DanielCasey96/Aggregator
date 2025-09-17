@@ -1,5 +1,6 @@
 package uk.casey.request.handlers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,11 +8,15 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.ArgumentCaptor;
+import uk.casey.models.ProductRequestModel;
+import uk.casey.models.RegistrationRequestModel;
 import uk.casey.request.services.UsersServiceInterface;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -25,12 +30,14 @@ public class RegistrationHandlerTest {
     private HttpExchange exchange;
     private UsersServiceInterface usersServiceInterface;
     private Properties properties;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         exchange = mock(HttpExchange.class);
         usersServiceInterface = mock(UsersServiceInterface.class);
         properties = mock(Properties.class);
+        objectMapper = mock(ObjectMapper.class);
     }
 
     @Tag("unit-integration")
@@ -51,13 +58,18 @@ public class RegistrationHandlerTest {
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/register"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
+        when(objectMapper.readValue(anyString(), eq(RegistrationRequestModel.class)))
+                .thenReturn(new RegistrationRequestModel(
+                        "boogaloo2",
+                        "electric",
+                        "clear@yahoo.com"));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
 
         when(usersServiceInterface.registerWithDatabase(
                 anyString(), anyString(), anyString(), any(Properties.class)
         )).thenReturn(UUID.randomUUID());
 
-        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties);
+        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -83,6 +95,11 @@ public class RegistrationHandlerTest {
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/register"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
+        when(objectMapper.readValue(anyString(), eq(RegistrationRequestModel.class)))
+                .thenReturn(new RegistrationRequestModel(
+                        "boogaloo2",
+                        "electric",
+                        "clear@yahoo.com"));
         OutputStream responseBody = mock(OutputStream.class);
         when(exchange.getResponseBody()).thenReturn(responseBody);
 
@@ -90,7 +107,7 @@ public class RegistrationHandlerTest {
                 anyString(), anyString(), anyString(), any(Properties.class)
         )).thenReturn(UUID.randomUUID());
 
-        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties);
+        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(responseBody).flush();
@@ -102,7 +119,7 @@ public class RegistrationHandlerTest {
     void returns405ForNonPostMethod() throws Exception {
         when(exchange.getRequestMethod()).thenReturn("GET");
 
-        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties);
+        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -117,7 +134,7 @@ public class RegistrationHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties);
+        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -131,7 +148,7 @@ public class RegistrationHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties);
+        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -163,6 +180,11 @@ public class RegistrationHandlerTest {
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/register"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
+        when(objectMapper.readValue(anyString(), eq(RegistrationRequestModel.class)))
+                .thenReturn(new RegistrationRequestModel(
+                        "boogaloo2",
+                        "password123",
+                        "clear@yahoo.com"));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
 
         when(usersServiceInterface.registerWithDatabase(
@@ -171,7 +193,7 @@ public class RegistrationHandlerTest {
 
         ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
 
-        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties);
+        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(usersServiceInterface).registerWithDatabase(
@@ -206,6 +228,11 @@ public class RegistrationHandlerTest {
             when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/register"));
             when(exchange.getRequestHeaders()).thenReturn(headers);
             when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
+            when(objectMapper.readValue(anyString(), eq(RegistrationRequestModel.class)))
+                    .thenReturn(new RegistrationRequestModel(
+                            "boogaloo2",
+                            password,
+                            "clear@yahoo.com"));
             when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
 
             when(usersServiceInterface.registerWithDatabase(
@@ -214,7 +241,7 @@ public class RegistrationHandlerTest {
 
             ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
 
-            RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties);
+            RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
             handler.handle(exchange);
 
             verify(usersServiceInterface).registerWithDatabase(anyString(), passwordCaptor.capture(), anyString(), any(Properties.class));
@@ -244,12 +271,17 @@ public class RegistrationHandlerTest {
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/register"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
+        when(objectMapper.readValue(anyString(), eq(RegistrationRequestModel.class)))
+                .thenReturn(new RegistrationRequestModel(
+                        "boogaloo2",
+                        "electric",
+                        "clear@yahoo.com"));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
         doThrow(new IOException("DB error IO")).when(usersServiceInterface).registerWithDatabase(
                 anyString(), anyString(), anyString(), any(Properties.class)
         );
 
-        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties);
+        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(500, -1);
@@ -273,12 +305,17 @@ public class RegistrationHandlerTest {
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/register"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
+        when(objectMapper.readValue(anyString(), eq(RegistrationRequestModel.class)))
+                .thenReturn(new RegistrationRequestModel(
+                        "boogaloo2",
+                        "electric",
+                        "clear@yahoo.com"));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
         doThrow(new SQLException("DB error IO")).when(usersServiceInterface).registerWithDatabase(
                 anyString(), anyString(), anyString(), any(Properties.class)
         );
 
-        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties);
+        RegistrationHandler handler = new RegistrationHandler(usersServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(500, -1);

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import uk.casey.models.RegistrationRequestModel;
 import uk.casey.models.ValueModel;
 
 import java.sql.SQLException;
@@ -32,6 +33,7 @@ public class UpdateProductHandlerTest {
     private ProductServiceInterface productServiceInterface;
     private JwtUtil jwtUtil;
     private Properties properties;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
@@ -39,6 +41,7 @@ public class UpdateProductHandlerTest {
         productServiceInterface = mock(ProductServiceInterface.class);
         jwtUtil = mock(JwtUtil.class);
         properties = mock(Properties.class);
+        objectMapper = mock(ObjectMapper.class);
     }
 
     @Tag("unit-integration")
@@ -52,13 +55,15 @@ public class UpdateProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
+        when(objectMapper.readValue(anyString(), eq(ValueModel.class)))
+                .thenReturn(new ValueModel(BigDecimal.valueOf(123.45)));
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream("{\"value\":123.45}".getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
 
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
+            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties, objectMapper);
             handler.handle(exchange);
 
             verify(exchange).getRequestMethod();
@@ -78,6 +83,8 @@ public class UpdateProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
+        when(objectMapper.readValue(anyString(), eq(ValueModel.class)))
+                .thenReturn(new ValueModel(BigDecimal.valueOf(123.45)));
         when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream("{\"value\":123.45}".getBytes()));
         OutputStream responseBody = mock(OutputStream.class);
         when(exchange.getResponseBody()).thenReturn(responseBody);
@@ -85,7 +92,7 @@ public class UpdateProductHandlerTest {
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
+            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties, objectMapper);
             handler.handle(exchange);
 
             verify(responseBody).flush();
@@ -98,7 +105,7 @@ public class UpdateProductHandlerTest {
     void returns405ForNonPostMethod() throws Exception {
         when(exchange.getRequestMethod()).thenReturn("GET");
 
-        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
+        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -115,7 +122,7 @@ public class UpdateProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
+        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -131,7 +138,7 @@ public class UpdateProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
+        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -146,7 +153,7 @@ public class UpdateProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
+        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -162,7 +169,7 @@ public class UpdateProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
+        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -193,10 +200,11 @@ public class UpdateProductHandlerTest {
 
     @Test
     void validRequestBodyReturnsValue() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
         String json = "{\"value\":123.45}";
 
         when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream(json.getBytes()));
+        when(objectMapper.readValue(anyString(), eq(ValueModel.class)))
+                .thenReturn(new ValueModel(BigDecimal.valueOf(123.45)));
 
         ValueModel valueModel = HandlerHelper.parseRequestBody(exchange, objectMapper, ValueModel.class);
 
@@ -207,10 +215,11 @@ public class UpdateProductHandlerTest {
     //Remove this is not specific to the handler
     @Test
     void invalidRequestBodyReturns400() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
         String json = "{";
 
         when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream(json.getBytes()));
+        when(objectMapper.readValue(anyString(), eq(ValueModel.class)))
+                .thenThrow(new RuntimeException("Invalid JSON"));
 
         HandlerHelper.parseRequestBody(exchange, objectMapper, ValueModel.class);
 
@@ -220,8 +229,6 @@ public class UpdateProductHandlerTest {
     //Remove this is not specific to the handler
     @Test
     void invalidRequestBodyMissingReturns400() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-
         when(exchange.getRequestBody()).thenReturn(null);
 
         HandlerHelper.parseRequestBody(exchange, objectMapper, ValueModel.class);
@@ -240,6 +247,8 @@ public class UpdateProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
+        when(objectMapper.readValue(anyString(), eq(ValueModel.class)))
+                .thenReturn(new ValueModel(BigDecimal.valueOf(123.45)));
         when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream("{\"value\":123.45}".getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
         doThrow(new SQLException("DB error SQL")).when(productServiceInterface).updateProductToDatabase(any(BigDecimal.class), anyInt(), any(UUID.class), any(Properties.class));
@@ -247,7 +256,7 @@ public class UpdateProductHandlerTest {
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
+            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties, objectMapper);
             handler.handle(exchange);
 
             verify(exchange).sendResponseHeaders(500, -1);
@@ -265,6 +274,8 @@ public class UpdateProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
+        when(objectMapper.readValue(anyString(), eq(ValueModel.class)))
+                .thenReturn(new ValueModel(BigDecimal.valueOf(123.45)));
         when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream("{\"value\":123.45}".getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
         doThrow(new IOException("DB error IO")).when(productServiceInterface).updateProductToDatabase(any(BigDecimal.class), anyInt(), any(UUID.class), any(Properties.class));
@@ -272,7 +283,7 @@ public class UpdateProductHandlerTest {
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
+            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties, objectMapper);
             handler.handle(exchange);
 
             verify(exchange).sendResponseHeaders(500, -1);

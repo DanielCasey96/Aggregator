@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
 
 import uk.casey.request.handlers.AuthorisationHandler;
@@ -24,14 +25,15 @@ public class AggregateController {
         ProductServiceInterface productServiceInterface = new ProductService();
         UsersServiceInterface usersServiceInterface = new UsersService();
         Properties properties = new Properties();
+        ObjectMapper objectMapper = new ObjectMapper();
 
         HttpServer httpServer = HttpServer.create(new InetSocketAddress("localhost", 8080), 0);
-        httpServer.createContext("/add-product", new NewProductHandler(productServiceInterface, properties));
-        httpServer.createContext("/accounts", new RetrievalHandler(productServiceInterface, properties));
-        httpServer.createContext("/update-value", new UpdateProductHandler(productServiceInterface, properties));
+        httpServer.createContext("/add-product", new NewProductHandler(productServiceInterface, properties, objectMapper));
+        httpServer.createContext("/accounts", new RetrievalHandler(productServiceInterface, properties, objectMapper));
+        httpServer.createContext("/update-value", new UpdateProductHandler(productServiceInterface, properties, objectMapper));
         httpServer.createContext("/remove-product", new RemoveProductHandler(productServiceInterface, properties));
-        httpServer.createContext("/register", new RegistrationHandler(usersServiceInterface, properties));
-        httpServer.createContext("/authorise", new AuthorisationHandler(usersServiceInterface, properties));
+        httpServer.createContext("/register", new RegistrationHandler(usersServiceInterface, properties, objectMapper));
+        httpServer.createContext("/authorise", new AuthorisationHandler(usersServiceInterface, properties, objectMapper));
         httpServer.setExecutor(Executors.newFixedThreadPool(10)); // Remove if hosting on lambda
         httpServer.start();
     }

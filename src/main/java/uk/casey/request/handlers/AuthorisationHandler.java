@@ -19,15 +19,16 @@ public class AuthorisationHandler implements HttpHandler {
 
     private final UsersServiceInterface usersServiceInterface;
     private final Properties properties;
+    private final ObjectMapper objectMapper;
 
-    public AuthorisationHandler(UsersServiceInterface usersServiceInterface, Properties properties) {
+    public AuthorisationHandler(UsersServiceInterface usersServiceInterface, Properties properties, ObjectMapper objectMapper) {
         this.usersServiceInterface = usersServiceInterface;
         this.properties = properties;
+        this.objectMapper = objectMapper;
     }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
         LoginRequestModel loginRequestModel;
 
         if (!"POST".equals(exchange.getRequestMethod())) {

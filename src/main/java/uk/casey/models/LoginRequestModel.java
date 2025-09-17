@@ -5,7 +5,7 @@ public class LoginRequestModel {
     private String username;
     private String passcode;
 
-    LoginRequestModel(
+    public LoginRequestModel(
             String username,
             String passcode) {
         this.username = username;

@@ -18,16 +18,16 @@ public class RetrievalHandler implements HttpHandler {
 
     private final ProductServiceInterface productServiceInterface;
     private final Properties properties;
+    private final ObjectMapper objectMapper;
 
-    public RetrievalHandler(ProductServiceInterface productServiceInterface, Properties properties) {
+    public RetrievalHandler(ProductServiceInterface productServiceInterface, Properties properties, ObjectMapper objectMapper) {
         this.productServiceInterface = productServiceInterface;
         this.properties = properties;
+        this.objectMapper = objectMapper;
     }
     
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-
         // Check basics of the users request before doing anything else
         if (!"GET".equals(exchange.getRequestMethod())) {
             exchange.sendResponseHeaders(405, -1); // Method Not Allowed

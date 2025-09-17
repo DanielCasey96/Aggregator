@@ -6,7 +6,7 @@ public class RegistrationRequestModel {
     private String passcode;
     private String email;
 
-    RegistrationRequestModel(
+    public RegistrationRequestModel(
             String username,
             String passcode,
             String email) {

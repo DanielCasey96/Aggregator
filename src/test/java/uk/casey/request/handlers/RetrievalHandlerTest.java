@@ -1,5 +1,6 @@
 package uk.casey.request.handlers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,7 @@ public class RetrievalHandlerTest {
     private ProductServiceInterface productServiceInterface;
     private JwtUtil jwtUtil;
     private Properties properties;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
@@ -33,6 +35,7 @@ public class RetrievalHandlerTest {
         productServiceInterface = mock(ProductServiceInterface.class);
         jwtUtil = mock(JwtUtil.class);
         properties = mock(Properties.class);
+        objectMapper = mock(ObjectMapper.class);
     }
 
     @Tag("unit-integration")
@@ -47,11 +50,12 @@ public class RetrievalHandlerTest {
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/accounts"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
+        when(objectMapper.writeValueAsString(any())).thenReturn("[]");
 
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties);
+            RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties, objectMapper);
             handler.handle(exchange);
 
             verify(exchange).getRequestMethod();
@@ -73,11 +77,12 @@ public class RetrievalHandlerTest {
         when(exchange.getRequestHeaders()).thenReturn(headers);
         OutputStream responseBody = mock(OutputStream.class);
         when(exchange.getResponseBody()).thenReturn(responseBody);
+        when(objectMapper.writeValueAsString(any())).thenReturn("[]");
 
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties);
+            RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties, objectMapper);
             handler.handle(exchange);
 
             verify(responseBody).flush();
@@ -90,7 +95,7 @@ public class RetrievalHandlerTest {
     void returns405ForNonGetMethod() throws Exception {
         when(exchange.getRequestMethod()).thenReturn("POST");
 
-        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties);
+        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -107,7 +112,7 @@ public class RetrievalHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties);
+        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -123,7 +128,7 @@ public class RetrievalHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties);
+        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -137,7 +142,7 @@ public class RetrievalHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties);
+        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -153,7 +158,7 @@ public class RetrievalHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("GET");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties);
+        RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -188,11 +193,12 @@ public class RetrievalHandlerTest {
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/accounts"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
+        when(objectMapper.writeValueAsString(any())).thenReturn("[]");
         doThrow(new SQLException("DB error SQL")).when(productServiceInterface).retrieveProductsFromDatabase(any(UUID.class), any(Properties.class));
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties);
+            RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties, objectMapper);
             handler.handle(exchange);
 
             verify(exchange).sendResponseHeaders(500, -1);
@@ -211,13 +217,14 @@ public class RetrievalHandlerTest {
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/accounts"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
+        when(objectMapper.writeValueAsString(any())).thenReturn("[]");
         doThrow(new IOException("DB error IO")).when(productServiceInterface).retrieveProductsFromDatabase(any(UUID.class), any(Properties.class));
 
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
 
-            RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties);
+            RetrievalHandler handler = new RetrievalHandler(productServiceInterface, properties, objectMapper);
             handler.handle(exchange);
 
             verify(exchange).sendResponseHeaders(500, -1);
