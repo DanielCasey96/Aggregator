@@ -5,6 +5,7 @@ The user can create an account and add each of their investments and savings to 
 
 ### Service impl
 This service intentionally doesn't use Spring for improved size, speed and the learning opportunity.
+The serivce utilises dependecny injection via Constructors with an intention of Inversion of Control.
 
 ### TODO
 Add DH exchange for password encryption

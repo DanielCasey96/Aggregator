@@ -12,6 +12,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import java.util.Properties;
 
 public class UsersServiceTest {
 
@@ -20,6 +21,7 @@ public class UsersServiceTest {
         String customerName = "Derrick";
         String passcode = "Sus4nB0yl3";
         String email = "clear@yahoo.com";
+        Properties properties = mock(Properties.class);
 
         UUID expectedUserId = UUID.randomUUID();
 
@@ -33,12 +35,16 @@ public class UsersServiceTest {
         Connection conn = mock(Connection.class);
         when(conn.prepareStatement(anyString())).thenReturn(stmt);
 
+        when(properties.getProperty("db.url")).thenReturn("jdbc:h2:mem:test");
+        when(properties.getProperty("db.username")).thenReturn("user");
+        when(properties.getProperty("db.password")).thenReturn("pass");
+
         try (MockedStatic<DriverManager> dm = mockStatic(DriverManager.class)) {
             dm.when(() -> DriverManager.getConnection(anyString(), anyString(), anyString()))
                     .thenReturn(conn);
 
             UsersService service = new UsersService();
-            UUID returnedUserId = service.registerWithDatabase(customerName, passcode, email);
+            UUID returnedUserId = service.registerWithDatabase(customerName, passcode, email, properties);
 
             assertNotNull(returnedUserId);
             assertEquals(expectedUserId, returnedUserId);
@@ -50,6 +56,7 @@ public class UsersServiceTest {
         UUID userId = UUID.fromString("3d95aaa8-a189-4f07-b3e0-734c0490b9c3");
         String customerName = "Derrick";
         String expectedHash = "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
+        Properties properties = mock(Properties.class);
 
         ResultSet rs = mock(ResultSet.class);
         when(rs.next()).thenReturn(true);
@@ -61,12 +68,16 @@ public class UsersServiceTest {
         Connection conn = mock(Connection.class);
         when(conn.prepareStatement(anyString())).thenReturn(stmt);
 
+        when(properties.getProperty("db.url")).thenReturn("jdbc:h2:mem:test");
+        when(properties.getProperty("db.username")).thenReturn("user");
+        when(properties.getProperty("db.password")).thenReturn("pass");
+
         try (MockedStatic<DriverManager> dm = mockStatic(DriverManager.class)) {
             dm.when(() -> DriverManager.getConnection(anyString(), anyString(), anyString()))
                     .thenReturn(conn);
 
             UsersService service = new UsersService();
-            String result = service.getStoredPassword(userId, customerName);
+            String result = service.getStoredPassword(userId, customerName, properties);
 
             assertEquals(expectedHash, result);
             verify(stmt).setObject(1, userId);
@@ -76,7 +87,9 @@ public class UsersServiceTest {
 
     @Test
     void getHashedPasscodeFromDatabase_noValue() throws Exception {
-        UUID userId = UUID.randomUUID();        String customerName = "ghost";
+        UUID userId = UUID.randomUUID();
+        String customerName = "ghost";
+        Properties properties = mock(Properties.class);
 
         ResultSet rs = mock(ResultSet.class);
         when(rs.next()).thenReturn(false);
@@ -87,12 +100,16 @@ public class UsersServiceTest {
         Connection conn = mock(Connection.class);
         when(conn.prepareStatement(anyString())).thenReturn(stmt);
 
+        when(properties.getProperty("db.url")).thenReturn("jdbc:h2:mem:test");
+        when(properties.getProperty("db.username")).thenReturn("user");
+        when(properties.getProperty("db.password")).thenReturn("pass");
+
         try (MockedStatic<DriverManager> dm = mockStatic(DriverManager.class)) {
             dm.when(() -> DriverManager.getConnection(anyString(), anyString(), anyString()))
                     .thenReturn(conn);
 
             UsersService service = new UsersService();
-            String result = service.getStoredPassword(userId, customerName);
+            String result = service.getStoredPassword(userId, customerName, properties);
 
             assertNull(result);
         }

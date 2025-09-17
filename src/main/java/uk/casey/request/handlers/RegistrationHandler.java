@@ -9,14 +9,17 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.UUID;
 
 public class RegistrationHandler implements HttpHandler {
 
     private final UsersServiceInterface usersServiceInterface;
+    private final Properties properties;
 
-    public RegistrationHandler(UsersServiceInterface usersServiceInterface) {
+    public RegistrationHandler(UsersServiceInterface usersServiceInterface, Properties properties) {
         this.usersServiceInterface = usersServiceInterface;
+        this.properties = properties;
     }
 
     @Override
@@ -48,7 +51,7 @@ public class RegistrationHandler implements HttpHandler {
         String hashedPassword = BCrypt.hashpw(registrationRequestModel.getPasscode(), BCrypt.gensalt());
 
         try {
-            UUID userId = usersServiceInterface.registerWithDatabase(registrationRequestModel.getUsername(), hashedPassword, registrationRequestModel.getEmail());
+            UUID userId = usersServiceInterface.registerWithDatabase(registrationRequestModel.getUsername(), hashedPassword, registrationRequestModel.getEmail(), properties);
             String response = "{\"userId\": \"" + userId + "\"}";
             exchange.sendResponseHeaders(201, response.getBytes().length);
             exchange.getResponseBody().write(response.getBytes());

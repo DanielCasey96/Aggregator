@@ -19,9 +19,8 @@ import uk.casey.models.ProductsTableResponseModel;
 public class ProductService implements ProductServiceInterface {
 
     @Override
-    public List<ProductsTableResponseModel> retrieveProductsFromDatabase(UUID userId) throws IOException, SQLException {
+    public List<ProductsTableResponseModel> retrieveProductsFromDatabase(UUID userId, Properties properties) throws IOException, SQLException {
         System.out.println("Starting to gather data from DB");
-        Properties properties = new Properties();
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
             properties.load(input);
         }
@@ -55,10 +54,9 @@ public class ProductService implements ProductServiceInterface {
     }
 
     @Override
-    public boolean updateProductToDatabase(BigDecimal newValue, int id, UUID userId) throws IOException, SQLException{
+    public boolean updateProductToDatabase(BigDecimal newValue, int id, UUID userId, Properties properties) throws IOException, SQLException{
         System.out.println("Starting to update DB");
 
-        Properties properties = new Properties();
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
             properties.load(input);
         }
@@ -81,10 +79,9 @@ public class ProductService implements ProductServiceInterface {
     }
 
     @Override
-    public boolean createProductInDatabase(UUID userId, String name, String type, String provider, String category, BigDecimal value, Timestamp updated_at) throws IOException, SQLException{
+    public boolean createProductInDatabase(UUID userId, String name, String type, String provider, String category, BigDecimal value, Timestamp updated_at, Properties properties) throws IOException, SQLException{
         System.out.println("Starting to update DB");
 
-        Properties properties = new Properties();
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
             properties.load(input);
         }
@@ -111,10 +108,9 @@ public class ProductService implements ProductServiceInterface {
     }
 
     @Override
-    public boolean removeProductFromDatabase(UUID userId, int id) throws IOException, SQLException {
+    public boolean removeProductFromDatabase(UUID userId, int id, Properties properties) throws IOException, SQLException {
         System.out.println("Starting to update DB");
 
-        Properties properties = new Properties();
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
             properties.load(input);
         }

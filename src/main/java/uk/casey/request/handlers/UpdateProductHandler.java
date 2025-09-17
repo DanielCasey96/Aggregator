@@ -3,6 +3,7 @@ package uk.casey.request.handlers;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,9 +17,11 @@ import uk.casey.utils.JwtUtil;
 public class UpdateProductHandler implements HttpHandler {
 
     private final ProductServiceInterface productServiceInterface;
+    private final Properties properties;
 
-    public UpdateProductHandler(ProductServiceInterface productServiceInterface) {
+    public UpdateProductHandler(ProductServiceInterface productServiceInterface, Properties properties) {
         this.productServiceInterface = productServiceInterface;
+        this.properties = properties;
     }
 
     @Override
@@ -63,7 +66,7 @@ public class UpdateProductHandler implements HttpHandler {
         }
 
         try {
-            productServiceInterface.updateProductToDatabase(newValue, id, userId);
+            productServiceInterface.updateProductToDatabase(newValue, id, userId, properties);
             exchange.sendResponseHeaders(204, -1);
             exchange.getResponseBody().flush();
             exchange.getResponseBody().close();

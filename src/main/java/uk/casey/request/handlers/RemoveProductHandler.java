@@ -2,6 +2,7 @@ package uk.casey.request.handlers;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.UUID;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -14,9 +15,11 @@ import uk.casey.utils.JwtUtil;
 public class RemoveProductHandler implements HttpHandler {
 
     private final ProductServiceInterface productServiceInterface;
+    private final Properties properties;
 
-    public RemoveProductHandler(ProductServiceInterface productServiceInterface) {
+    public RemoveProductHandler(ProductServiceInterface productServiceInterface, Properties properties) {
         this.productServiceInterface = productServiceInterface;
+        this.properties = properties;
     }
 
      @Override
@@ -46,7 +49,7 @@ public class RemoveProductHandler implements HttpHandler {
          }
 
          try {
-             productServiceInterface.removeProductFromDatabase(userId, id);
+             productServiceInterface.removeProductFromDatabase(userId, id, properties);
              exchange.sendResponseHeaders(204, -1);
              exchange.getResponseBody().flush();
              exchange.getResponseBody().close();

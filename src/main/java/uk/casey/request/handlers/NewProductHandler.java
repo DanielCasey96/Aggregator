@@ -2,6 +2,7 @@ package uk.casey.request.handlers;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
@@ -14,9 +15,11 @@ import uk.casey.utils.JwtUtil;
 public class NewProductHandler implements HttpHandler {
 
     private final ProductServiceInterface productServiceInterface;
+    private final Properties properties;
 
-    public NewProductHandler(ProductServiceInterface productServiceInterface) {
+    public NewProductHandler(ProductServiceInterface productServiceInterface, Properties properties) {
         this.productServiceInterface = productServiceInterface;
+        this.properties = properties;
     }
 
     @Override
@@ -48,7 +51,7 @@ public class NewProductHandler implements HttpHandler {
         prm  = HandlerHelper.parseRequestBody(exchange, objectMapper, ProductRequestModel.class);
 
         try {
-            productServiceInterface.createProductInDatabase(prm.getUserId(), prm.getName(), prm.getType(), prm.getProvider(), prm.getCategory(), prm.getValue(), prm.getUpdatedAt());
+            productServiceInterface.createProductInDatabase(prm.getUserId(), prm.getName(), prm.getType(), prm.getProvider(), prm.getCategory(), prm.getValue(), prm.getUpdatedAt(), properties);
             exchange.sendResponseHeaders(201, -1);
             exchange.getResponseBody().flush();
             exchange.getResponseBody().close();

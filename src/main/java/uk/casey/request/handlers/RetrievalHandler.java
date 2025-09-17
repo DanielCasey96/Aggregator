@@ -3,6 +3,7 @@ package uk.casey.request.handlers;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,9 +17,11 @@ import uk.casey.utils.JwtUtil;
 public class RetrievalHandler implements HttpHandler {
 
     private final ProductServiceInterface productServiceInterface;
+    private final Properties properties;
 
-    public RetrievalHandler(ProductServiceInterface productServiceInterface) {
+    public RetrievalHandler(ProductServiceInterface productServiceInterface, Properties properties) {
         this.productServiceInterface = productServiceInterface;
+        this.properties = properties;
     }
     
     @Override
@@ -50,7 +53,7 @@ public class RetrievalHandler implements HttpHandler {
         // Make GET call to DB to determine current state of Data
         List<ProductsTableResponseModel> dbResponse; 
         try {
-            dbResponse = productServiceInterface.retrieveProductsFromDatabase(userId);
+            dbResponse = productServiceInterface.retrieveProductsFromDatabase(userId, properties);
             String response = objectMapper.writeValueAsString(dbResponse);
             exchange.sendResponseHeaders(200, response.length());
             exchange.getResponseBody().write(response.getBytes());

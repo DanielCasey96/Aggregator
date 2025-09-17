@@ -2,6 +2,7 @@ package uk.casey.request.handlers;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,9 +18,11 @@ import uk.casey.utils.JwtUtil;
 public class AuthorisationHandler implements HttpHandler {
 
     private final UsersServiceInterface usersServiceInterface;
+    private final Properties properties;
 
-    public AuthorisationHandler(UsersServiceInterface usersServiceInterface) {
+    public AuthorisationHandler(UsersServiceInterface usersServiceInterface, Properties properties) {
         this.usersServiceInterface = usersServiceInterface;
+        this.properties = properties;
     }
 
     @Override
@@ -51,7 +54,7 @@ public class AuthorisationHandler implements HttpHandler {
         }
 
         try {
-            String storedHash = usersServiceInterface.getStoredPassword(userId, loginRequestModel.getUsername());
+            String storedHash = usersServiceInterface.getStoredPassword(userId, loginRequestModel.getUsername(), properties);
 
             if (storedHash == null) {
                 exchange.sendResponseHeaders(401, -1);

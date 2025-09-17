@@ -8,10 +8,9 @@ import java.util.UUID;
 
 public class UsersService implements UsersServiceInterface {
 
-    public UUID registerWithDatabase(String customerUsername, String passcode, String email) throws IOException, SQLException {
+    public UUID registerWithDatabase(String customerUsername, String passcode, String email, Properties properties) throws IOException, SQLException {
         System.out.println("Starting to update DB");
 
-        Properties properties = new Properties();
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
             properties.load(input);
         }
@@ -39,10 +38,9 @@ public class UsersService implements UsersServiceInterface {
         }
     }
 
-    public String getStoredPassword(UUID userId, String customerUsername) throws IOException, SQLException {
+    public String getStoredPassword(UUID userId, String customerUsername, Properties properties) throws IOException, SQLException {
         System.out.println("Starting to update DB");
 
-        Properties properties = new Properties();
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
             properties.load(input);
         }

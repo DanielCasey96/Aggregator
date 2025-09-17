@@ -11,6 +11,7 @@ import uk.casey.request.services.UsersServiceInterface;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -21,11 +22,13 @@ public class AuthorisationHandlerTest {
 
     private HttpExchange exchange;
     private UsersServiceInterface usersServiceInterface;
+    private Properties properties;
 
     @BeforeEach
     void setUp() {
         exchange = mock(HttpExchange.class);
         usersServiceInterface = mock(UsersServiceInterface.class);
+        properties = mock(Properties.class);
     }
 
     @Tag("unit-integration")
@@ -50,10 +53,10 @@ public class AuthorisationHandlerTest {
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
 
         when(usersServiceInterface.getStoredPassword(
-                any(UUID.class), anyString()
+                any(UUID.class), anyString(), any(Properties.class)
         )).thenReturn(storedHash);
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -84,10 +87,10 @@ public class AuthorisationHandlerTest {
         when(exchange.getResponseBody()).thenReturn(responseBody);
 
         when(usersServiceInterface.getStoredPassword(
-                any(UUID.class), anyString()
+                any(UUID.class), anyString(), any(Properties.class)
         )).thenReturn(storedHash);
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties);
         handler.handle(exchange);
 
         verify(responseBody).flush();
@@ -99,7 +102,7 @@ public class AuthorisationHandlerTest {
     void returns405ForNonPostMethod() throws Exception {
         when(exchange.getRequestMethod()).thenReturn("GET");
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -115,7 +118,7 @@ public class AuthorisationHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -130,7 +133,7 @@ public class AuthorisationHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -144,7 +147,7 @@ public class AuthorisationHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -159,7 +162,7 @@ public class AuthorisationHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -185,10 +188,10 @@ public class AuthorisationHandlerTest {
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
         doThrow(new IOException("DB error IO")).when(usersServiceInterface).getStoredPassword(
-                any(UUID.class), anyString()
+                any(UUID.class), anyString(), any(Properties.class)
         );
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(500, -1);
@@ -214,10 +217,10 @@ public class AuthorisationHandlerTest {
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
         doThrow(new SQLException("DB error IO")).when(usersServiceInterface).getStoredPassword(
-                any(UUID.class), anyString()
+                any(UUID.class), anyString(), any(Properties.class)
         );
 
-        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface);
+        AuthorisationHandler handler = new AuthorisationHandler(usersServiceInterface, properties);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(500, -1);

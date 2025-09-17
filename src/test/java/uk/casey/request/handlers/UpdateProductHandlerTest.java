@@ -1,6 +1,7 @@
 package uk.casey.request.handlers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import org.junit.jupiter.api.Assertions;
@@ -16,6 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.util.Properties;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,12 +31,14 @@ public class UpdateProductHandlerTest {
     private HttpExchange exchange;
     private ProductServiceInterface productServiceInterface;
     private JwtUtil jwtUtil;
+    private Properties properties;
 
     @BeforeEach
     void setUp() {
         exchange = mock(HttpExchange.class);
         productServiceInterface = mock(ProductServiceInterface.class);
         jwtUtil = mock(JwtUtil.class);
+        properties = mock(Properties.class);
     }
 
     @Tag("unit-integration")
@@ -54,7 +58,7 @@ public class UpdateProductHandlerTest {
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface);
+            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
             handler.handle(exchange);
 
             verify(exchange).getRequestMethod();
@@ -81,7 +85,7 @@ public class UpdateProductHandlerTest {
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface);
+            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
             handler.handle(exchange);
 
             verify(responseBody).flush();
@@ -94,7 +98,7 @@ public class UpdateProductHandlerTest {
     void returns405ForNonPostMethod() throws Exception {
         when(exchange.getRequestMethod()).thenReturn("GET");
 
-        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface);
+        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -111,7 +115,7 @@ public class UpdateProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface);
+        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -127,7 +131,7 @@ public class UpdateProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface);
+        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -142,7 +146,7 @@ public class UpdateProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface);
+        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -158,7 +162,7 @@ public class UpdateProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface);
+        UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -238,12 +242,12 @@ public class UpdateProductHandlerTest {
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream("{\"value\":123.45}".getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
-        doThrow(new SQLException("DB error SQL")).when(productServiceInterface).updateProductToDatabase(any(BigDecimal.class), anyInt(), any(UUID.class));
+        doThrow(new SQLException("DB error SQL")).when(productServiceInterface).updateProductToDatabase(any(BigDecimal.class), anyInt(), any(UUID.class), any(Properties.class));
 
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface);
+            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
             handler.handle(exchange);
 
             verify(exchange).sendResponseHeaders(500, -1);
@@ -263,12 +267,12 @@ public class UpdateProductHandlerTest {
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream("{\"value\":123.45}".getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
-        doThrow(new IOException("DB error IO")).when(productServiceInterface).updateProductToDatabase(any(BigDecimal.class), anyInt(), any(UUID.class));
+        doThrow(new IOException("DB error IO")).when(productServiceInterface).updateProductToDatabase(any(BigDecimal.class), anyInt(), any(UUID.class), any(Properties.class));
 
         try (MockedStatic<JwtUtil> jwtUtilMock = mockStatic(JwtUtil.class)) {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
-            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface);
+            UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, properties);
             handler.handle(exchange);
 
             verify(exchange).sendResponseHeaders(500, -1);
