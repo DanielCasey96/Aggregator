@@ -2,35 +2,63 @@ package uk.casey.request.handlers;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 
 public class HandlerHelper {
 
-    public static boolean validateHeaders(HttpExchange exchange, String userIdStr) throws IOException {
+    public static HeaderValidationResult validateHeaders(HttpExchange exchange, Map<String, Predicate<String>> requiredHeaders) throws IOException {
+        Map<String, String> found = new HashMap<>();
 
-        String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
-        if (contentType == null || !contentType.equals("application/json")) {
-            exchange.sendResponseHeaders(400, -1);
-            System.out.println("Missing or invalid Content-Type header");
-            return false;
+        for(Map.Entry<String, Predicate<String>> entry : requiredHeaders.entrySet()) {
+            String headerName = entry.getKey();
+            Predicate<String> check = entry.getValue();
+            String headerValueRaw = exchange.getRequestHeaders().getFirst(headerName);
+
+            if(headerValueRaw == null) {
+                String message = "Header missing "+ headerName;
+                exchange.sendResponseHeaders(400, -1);
+                return HeaderValidationResult.failure(400, message);
+            }
+
+            String headerValue = headerValueRaw.trim();
+
+            if(check != null && !check.test(headerValue)) {
+                String message = "Header format invalid " + headerName;
+                exchange.sendResponseHeaders(400, -1);
+                return HeaderValidationResult.failure(400, message);
+            }
+
+            found.put(headerName, headerValue);
         }
-        if (userIdStr == null) {
-            exchange.sendResponseHeaders(400, -1);
-            System.out.println("Missing UserId header");
-            return false;
-        }
-        UUID userId;
-        try {
-            userId = UUID.fromString(userIdStr);
-        } catch (IllegalArgumentException e) {
-            exchange.sendResponseHeaders(400, -1);
-            System.out.println("Invalid UserId format");
-            return false;
-        }
-        return true;
+
+        return HeaderValidationResult.success(found);
+    }
+
+    public static Predicate<String> anyValue() {
+        return Objects::nonNull;
+    }
+
+    public static Predicate<String> isJsonContentType() {
+        return s -> s != null && s.toLowerCase().startsWith("application/json");
+    }
+
+    public static Predicate<String> isUUID() {
+        return s -> {
+            if (s == null) return false;
+            try {
+                UUID.fromString(s);
+                return true;
+            } catch (IllegalArgumentException e) {
+                return false;
+            }
+        };
     }
 
     public static Integer validateUrlWithId(String path, String endpoint, HttpExchange exchange) throws IOException {
@@ -77,5 +105,30 @@ public class HandlerHelper {
             System.out.println("Invalid JSON format");
             return null;
         }
+    }
+
+    public static final class HeaderValidationResult {
+        private final boolean valid;
+        private final int statusCode;
+        private final String message;
+        private final Map<String, String> values;
+
+        private HeaderValidationResult(boolean valid, int statusCode, String message, Map<String, String> values) {
+            this.valid = valid;
+            this.statusCode = statusCode;
+            this.message = message;
+            this.values = values;
+        }
+
+        public static HeaderValidationResult success(Map<String, String> values) {
+            return new HeaderValidationResult(true, 200, null, values);
+        }
+
+        public static HeaderValidationResult failure(int statusCode, String message) {
+            return new HeaderValidationResult(false, statusCode, message, null);
+        }
+
+        public boolean isValid() { return valid; }
+        public Map<String, String> getValues() { return values; }
     }
 }

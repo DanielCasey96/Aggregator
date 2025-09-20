@@ -9,7 +9,10 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 public class RegistrationHandler implements HttpHandler {
 
@@ -30,12 +33,9 @@ public class RegistrationHandler implements HttpHandler {
             return;
         }
 
-        String accept = exchange.getRequestHeaders().getFirst("Accept");
-        if (accept == null || !accept.equals("application/json")) {
-            exchange.sendResponseHeaders(400, -1);
-            System.out.println("Missing or invalid Content-Type header");
-            return;
-        }
+        Map<String, Predicate<String>> requiredHeaders = new HashMap<>();
+        requiredHeaders.put("Accept", HandlerHelper.isJsonContentType());
+        if (!HandlerHelper.validateHeaders(exchange, requiredHeaders).isValid()) return;
 
         String path = exchange.getRequestURI().getPath();
         HandlerHelper.validateUrlNoId(path,"register", exchange);

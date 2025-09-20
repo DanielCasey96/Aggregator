@@ -47,7 +47,7 @@ public class UpdateProductHandlerTest {
     void updateProductHandlerSuccess() throws IOException {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
-        headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("POST");
@@ -75,7 +75,7 @@ public class UpdateProductHandlerTest {
     void updateProductIsFlushedAndClosedAfterSuccessfulUpdate() throws IOException {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
-        headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("POST");
@@ -115,7 +115,7 @@ public class UpdateProductHandlerTest {
     @Test
     void returns400ForMissingContentType() throws IOException {
         Headers headers = new Headers();
-        headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
@@ -131,7 +131,7 @@ public class UpdateProductHandlerTest {
     void returns400ForContentTypeValueIncorrect() throws IOException {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/txt");
-        headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
@@ -162,7 +162,7 @@ public class UpdateProductHandlerTest {
     void returns400ForUserIdIncorrectValue() throws IOException {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
-        headers.add("UserId", "notAUUIDFormat");
+        headers.add("User-Id", "notAUUIDFormat");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
@@ -239,7 +239,7 @@ public class UpdateProductHandlerTest {
     void returns500WhenDatabaseUpdateFailsSQLException() throws Exception {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
-        headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("POST");
@@ -266,7 +266,7 @@ public class UpdateProductHandlerTest {
     void returns500WhenDatabaseUpdateFailsIOException() throws Exception {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
-        headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("POST");

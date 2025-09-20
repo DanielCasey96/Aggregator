@@ -2,8 +2,11 @@ package uk.casey.request.handlers;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
@@ -34,11 +37,14 @@ public class AuthorisationHandler implements HttpHandler {
             return;
         }
 
-        String userIdStr = exchange.getRequestHeaders().getFirst("UserId");
-        if (!HandlerHelper.validateHeaders(exchange, userIdStr)) {
+        Map<String, Predicate<String>> requiredHeaders = new HashMap<>();
+        requiredHeaders.put("User-Id", HandlerHelper.isUUID());
+        requiredHeaders.put("Content-Type", HandlerHelper.isJsonContentType());
+        HandlerHelper.HeaderValidationResult headerResult = HandlerHelper.validateHeaders(exchange, requiredHeaders);
+        if (!headerResult.isValid()) {
             return;
         }
-        UUID userId = UUID.fromString(userIdStr);
+        UUID userId = UUID.fromString(headerResult.getValues().get("User-Id"));
 
         String path = exchange.getRequestURI().getPath();
         boolean validUrl = HandlerHelper.validateUrlNoId(path, "authorise", exchange);

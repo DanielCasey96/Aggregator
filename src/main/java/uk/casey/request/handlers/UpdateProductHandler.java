@@ -3,8 +3,11 @@ package uk.casey.request.handlers;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
@@ -32,13 +35,15 @@ public class UpdateProductHandler implements HttpHandler {
         }
 
         // Header validation
-        String userIdStr = exchange.getRequestHeaders().getFirst("UserId");
-        if(!HandlerHelper.validateHeaders(exchange, userIdStr)) {
-            return;
-        }
-        UUID userId = UUID.fromString(userIdStr);
+        Map<String, Predicate<String>> requiredHeaders = new HashMap<>();
+        requiredHeaders.put("User-Id", HandlerHelper.isUUID());
+        requiredHeaders.put("Content-Type", HandlerHelper.isJsonContentType());
+        requiredHeaders.put("Authorisation", HandlerHelper.anyValue());
+        HandlerHelper.HeaderValidationResult headerResult = HandlerHelper.validateHeaders(exchange, requiredHeaders);
+        if (!headerResult.isValid()) return;
+        UUID userId = UUID.fromString(headerResult.getValues().get("User-Id"));
 
-        String token = exchange.getRequestHeaders().getFirst("Authorisation");
+        String token = headerResult.getValues().get("Authorisation");
         if (!JwtUtil.validateToken(token)) {
             exchange.sendResponseHeaders(401, -1);
             return;

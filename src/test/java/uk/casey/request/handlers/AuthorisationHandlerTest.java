@@ -37,7 +37,7 @@ public class AuthorisationHandlerTest {
     @Test
     void authorisationHandlerSuccess() throws IOException, SQLException {
         Headers headers = new Headers();
-        headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Content-Type", "application/json");
         String storedHash = BCrypt.hashpw("fatty", BCrypt.gensalt());
 
@@ -72,7 +72,7 @@ public class AuthorisationHandlerTest {
     @Test
     void authorisationHandlerIsFlushedAndClosed() throws IOException, SQLException {
         Headers headers = new Headers();
-        headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Content-Type", "application/json");
         String storedHash = BCrypt.hashpw("fatty", BCrypt.gensalt());
 
@@ -120,7 +120,7 @@ public class AuthorisationHandlerTest {
     @Test
     void returns400ForMissingContentType() throws IOException {
         Headers headers = new Headers();
-        headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
@@ -135,7 +135,7 @@ public class AuthorisationHandlerTest {
     void returns400ForContentTypeValueIncorrect() throws IOException {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/txt");
-        headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
@@ -164,7 +164,7 @@ public class AuthorisationHandlerTest {
     void returns400ForUserIdIncorrectValue() throws IOException {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
-        headers.add("UserId", "notAUUIDFormat");
+        headers.add("User-Id", "notAUUIDFormat");
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
@@ -179,7 +179,7 @@ public class AuthorisationHandlerTest {
     void returns500WhenDatabaseUpdateFailsIOException() throws Exception {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
-        headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
 
         String json = """
                 {
@@ -210,7 +210,7 @@ public class AuthorisationHandlerTest {
     void returns500WhenDatabaseUpdateFailsSQLException() throws Exception {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
-        headers.add("UserId", "123e4567-e89b-12d3-a456-426614174000");
+        headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
 
         String json = """
                 {
