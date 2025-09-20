@@ -235,16 +235,18 @@ public class NewProductHandlerTest {
 
     @Test
     void validUrlReturnsSuccess() throws Exception {
+        HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        boolean result = HandlerHelper.validateUrlNoId("/add-product", "add-product", exchange);
+        boolean result = helper.validateUrlNoId("/add-product", "add-product", exchange);
         assertEquals(true, result);
         verify(exchange, never()).sendResponseHeaders(anyInt(), anyLong());
     }
 
     @Test
     void invalidUrlReturns404() throws Exception {
+        HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        boolean result = HandlerHelper.validateUrlNoId("/add-product/chicken", "add-product", exchange);
+        boolean result = helper.validateUrlNoId("/add-product/chicken", "add-product", exchange);
         verify(exchange).sendResponseHeaders(404, -1);
         assertEquals(false, result);
     }

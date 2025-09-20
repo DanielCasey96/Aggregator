@@ -18,7 +18,7 @@ import uk.casey.request.services.ProductService;
 import uk.casey.request.services.UsersServiceInterface;
 import uk.casey.utils.JwtUtil;
 
-public class AuthorisationHandler implements HttpHandler {
+public class AuthorisationHandler extends HandlerHelper implements HttpHandler {
 
     private final UsersServiceInterface usersServiceInterface;
     private final ObjectMapper objectMapper;
@@ -38,21 +38,21 @@ public class AuthorisationHandler implements HttpHandler {
         }
 
         Map<String, Predicate<String>> requiredHeaders = new HashMap<>();
-        requiredHeaders.put("User-Id", HandlerHelper.isUUID());
-        requiredHeaders.put("Content-Type", HandlerHelper.isJsonContentType());
-        HandlerHelper.HeaderValidationResult headerResult = HandlerHelper.validateHeaders(exchange, requiredHeaders);
+        requiredHeaders.put("User-Id", isUUID());
+        requiredHeaders.put("Content-Type", isJsonContentType());
+        HeaderValidationResult headerResult = validateHeaders(exchange, requiredHeaders);
         if (!headerResult.isValid()) {
             return;
         }
         UUID userId = UUID.fromString(headerResult.getValues().get("User-Id"));
 
         String path = exchange.getRequestURI().getPath();
-        boolean validUrl = HandlerHelper.validateUrlNoId(path, "authorise", exchange);
+        boolean validUrl = validateUrlNoId(path, "authorise", exchange);
         if(!validUrl) {
             exchange.sendResponseHeaders(404, -1);
         }
 
-        loginRequestModel = HandlerHelper.parseRequestBody(exchange, objectMapper, LoginRequestModel.class);
+        loginRequestModel = parseRequestBody(exchange, objectMapper, LoginRequestModel.class);
         if (loginRequestModel == null) {
             exchange.sendResponseHeaders(400, -1);
             return;

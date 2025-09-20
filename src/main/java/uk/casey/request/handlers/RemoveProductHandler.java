@@ -14,7 +14,7 @@ import com.sun.net.httpserver.HttpHandler;
 import uk.casey.request.services.ProductServiceInterface;
 import uk.casey.utils.JwtUtil;
 
-public class RemoveProductHandler implements HttpHandler {
+public class RemoveProductHandler extends HandlerHelper implements HttpHandler {
 
     private final ProductServiceInterface productServiceInterface;
 
@@ -30,10 +30,10 @@ public class RemoveProductHandler implements HttpHandler {
          }
 
          Map<String, Predicate<String>> requiredHeaders = new HashMap<>();
-         requiredHeaders.put("User-Id", HandlerHelper.isUUID());
-         requiredHeaders.put("Content-Type", HandlerHelper.isJsonContentType());
-         requiredHeaders.put("Authorisation", HandlerHelper.anyValue());
-         HandlerHelper.HeaderValidationResult headerResult = HandlerHelper.validateHeaders(exchange, requiredHeaders);
+         requiredHeaders.put("User-Id", isUUID());
+         requiredHeaders.put("Content-Type", isJsonContentType());
+         requiredHeaders.put("Authorisation", anyValue());
+         HeaderValidationResult headerResult = validateHeaders(exchange, requiredHeaders);
          if (!headerResult.isValid()) return;
          UUID userId = UUID.fromString(headerResult.getValues().get("User-Id"));
 
@@ -45,7 +45,7 @@ public class RemoveProductHandler implements HttpHandler {
 
          // URL validation
          String path = exchange.getRequestURI().getPath();
-         int id = HandlerHelper.validateUrlWithId(path, "remove-product", exchange);
+         int id = validateUrlWithId(path, "remove-product", exchange);
          if (id == -1) {
              return;
          }

@@ -164,8 +164,9 @@ public class RemoveProductHandlerTest {
     //Remove this is not specific to the handler
     @Test
     void validUrlReturnsId() throws Exception {
+        HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        int id = HandlerHelper.validateUrlWithId("/remove-product/42", "remove-product", exchange);
+        int id = helper.validateUrlWithId("/remove-product/42", "remove-product", exchange);
         assertEquals(42, id);
         verify(exchange, never()).sendResponseHeaders(anyInt(), anyLong());
     }
@@ -173,8 +174,9 @@ public class RemoveProductHandlerTest {
     //Remove this is not specific to the handler
     @Test
     void invalidUrlReturns404() throws Exception {
+        HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        int id = HandlerHelper.validateUrlWithId("/remove/chicken/1", "remove-product", exchange);
+        int id = helper.validateUrlWithId("/remove/chicken/1", "remove-product", exchange);
         assertEquals(-1, id);
         verify(exchange).sendResponseHeaders(404, -1);
     }
@@ -182,8 +184,9 @@ public class RemoveProductHandlerTest {
     //Remove this is not specific to the handler
     @Test
     void invalidUrlMissingIdReturns404() throws Exception {
+        HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        int id = HandlerHelper.validateUrlWithId("/remove-product", "remove-product", exchange);
+        int id = helper.validateUrlWithId("/remove-product", "remove-product", exchange);
         verify(exchange).sendResponseHeaders(404, -1);
     }
 

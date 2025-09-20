@@ -17,7 +17,7 @@ import uk.casey.models.ValueModel;
 import uk.casey.request.services.ProductServiceInterface;
 import uk.casey.utils.JwtUtil;
 
-public class UpdateProductHandler implements HttpHandler {
+public class UpdateProductHandler extends HandlerHelper implements HttpHandler {
 
     private final ProductServiceInterface productServiceInterface;
     private final ObjectMapper objectMapper;
@@ -29,17 +29,14 @@ public class UpdateProductHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        if (!"POST".equals(exchange.getRequestMethod())) {
-            exchange.sendResponseHeaders(405, -1); // Method Not Allowed
-            return;
-        }
+        if(!methodValidation(exchange, "PATCH")) return;
 
         // Header validation
         Map<String, Predicate<String>> requiredHeaders = new HashMap<>();
-        requiredHeaders.put("User-Id", HandlerHelper.isUUID());
-        requiredHeaders.put("Content-Type", HandlerHelper.isJsonContentType());
-        requiredHeaders.put("Authorisation", HandlerHelper.anyValue());
-        HandlerHelper.HeaderValidationResult headerResult = HandlerHelper.validateHeaders(exchange, requiredHeaders);
+        requiredHeaders.put("User-Id", isUUID());
+        requiredHeaders.put("Content-Type", isJsonContentType());
+        requiredHeaders.put("Authorisation", anyValue());
+        HeaderValidationResult headerResult = validateHeaders(exchange, requiredHeaders);
         if (!headerResult.isValid()) return;
         UUID userId = UUID.fromString(headerResult.getValues().get("User-Id"));
 
@@ -51,13 +48,13 @@ public class UpdateProductHandler implements HttpHandler {
 
         // URL validation
         String path = exchange.getRequestURI().getPath();
-        int id = HandlerHelper.validateUrlWithId(path, "update-value", exchange);
+        int id = validateUrlWithId(path, "update-value", exchange);
         if (id == -1) {
             return;
         }
 
         // Parse the request body
-        ValueModel valueModel = HandlerHelper.parseRequestBody(exchange, objectMapper, ValueModel.class);
+        ValueModel valueModel = parseRequestBody(exchange, objectMapper, ValueModel.class);
 
         BigDecimal newValue;
         try {

@@ -11,9 +11,19 @@ import java.util.function.Predicate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 
-public class HandlerHelper {
+abstract class HandlerHelper {
 
-    public static HeaderValidationResult validateHeaders(HttpExchange exchange, Map<String, Predicate<String>> requiredHeaders) throws IOException {
+    protected boolean methodValidation(HttpExchange exchange, String expectedMethod) throws IOException {
+        String actualMethod = exchange.getRequestMethod();
+        if(actualMethod == null || !expectedMethod.equalsIgnoreCase(actualMethod)) {
+            exchange.sendResponseHeaders(405, -1);
+            System.out.println("Incorrect Method Type");
+            return false;
+        }
+        return true;
+    }
+
+    protected HeaderValidationResult validateHeaders(HttpExchange exchange, Map<String, Predicate<String>> requiredHeaders) throws IOException {
         Map<String, String> found = new HashMap<>();
 
         for(Map.Entry<String, Predicate<String>> entry : requiredHeaders.entrySet()) {
@@ -41,15 +51,15 @@ public class HandlerHelper {
         return HeaderValidationResult.success(found);
     }
 
-    public static Predicate<String> anyValue() {
+    protected Predicate<String> anyValue() {
         return Objects::nonNull;
     }
 
-    public static Predicate<String> isJsonContentType() {
+    protected Predicate<String> isJsonContentType() {
         return s -> s != null && s.toLowerCase().startsWith("application/json");
     }
 
-    public static Predicate<String> isUUID() {
+    protected Predicate<String> isUUID() {
         return s -> {
             if (s == null) return false;
             try {
@@ -61,7 +71,7 @@ public class HandlerHelper {
         };
     }
 
-    public static Integer validateUrlWithId(String path, String endpoint, HttpExchange exchange) throws IOException {
+    protected Integer validateUrlWithId(String path, String endpoint, HttpExchange exchange) throws IOException {
         String[] uriParts = path.split("/");
         if (uriParts.length == 3 && uriParts[1].equals(endpoint)) {
             try {
@@ -76,7 +86,7 @@ public class HandlerHelper {
         }
     }
 
-    public static boolean validateUrlNoId(String path, String endpoint, HttpExchange exchange) throws IOException {
+    protected boolean validateUrlNoId(String path, String endpoint, HttpExchange exchange) throws IOException {
         String[] uriParts = path.split("/");
         if (uriParts.length == 2 && uriParts[1].equals(endpoint)) {
             return true;
@@ -86,7 +96,7 @@ public class HandlerHelper {
         }
     }
 
-    public static <T> T parseRequestBody(HttpExchange exchange, ObjectMapper objectMapper, Class<T> clazz) throws IOException {
+    protected <T> T parseRequestBody(HttpExchange exchange, ObjectMapper objectMapper, Class<T> clazz) throws IOException {
         InputStream requestBody = exchange.getRequestBody();
         if(requestBody == null) {
             exchange.sendResponseHeaders(400, -1);

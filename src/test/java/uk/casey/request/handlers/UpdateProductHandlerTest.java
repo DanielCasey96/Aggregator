@@ -50,7 +50,7 @@ public class UpdateProductHandlerTest {
         headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
-        when(exchange.getRequestMethod()).thenReturn("POST");
+        when(exchange.getRequestMethod()).thenReturn("PATCH");
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(objectMapper.readValue(anyString(), eq(ValueModel.class)))
@@ -78,7 +78,7 @@ public class UpdateProductHandlerTest {
         headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
-        when(exchange.getRequestMethod()).thenReturn("POST");
+        when(exchange.getRequestMethod()).thenReturn("PATCH");
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(objectMapper.readValue(anyString(), eq(ValueModel.class)))
@@ -117,7 +117,7 @@ public class UpdateProductHandlerTest {
         Headers headers = new Headers();
         headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
-        when(exchange.getRequestMethod()).thenReturn("POST");
+        when(exchange.getRequestMethod()).thenReturn("PATCH");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
         UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, objectMapper);
@@ -133,7 +133,7 @@ public class UpdateProductHandlerTest {
         headers.add("Content-Type", "application/txt");
         headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
-        when(exchange.getRequestMethod()).thenReturn("POST");
+        when(exchange.getRequestMethod()).thenReturn("PATCH");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
         UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, objectMapper);
@@ -148,7 +148,7 @@ public class UpdateProductHandlerTest {
         Headers headers = new Headers();
         headers.add("Content-Type", "application/json");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
-        when(exchange.getRequestMethod()).thenReturn("POST");
+        when(exchange.getRequestMethod()).thenReturn("PATCH");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
         UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, objectMapper);
@@ -164,7 +164,7 @@ public class UpdateProductHandlerTest {
         headers.add("Content-Type", "application/json");
         headers.add("User-Id", "notAUUIDFormat");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
-        when(exchange.getRequestMethod()).thenReturn("POST");
+        when(exchange.getRequestMethod()).thenReturn("PATCH");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
         UpdateProductHandler handler = new UpdateProductHandler(productServiceInterface, objectMapper);
@@ -175,36 +175,40 @@ public class UpdateProductHandlerTest {
 
     @Test
     void validUrlReturnsId() throws Exception {
+        HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        int id = HandlerHelper.validateUrlWithId("/update-value/42", "update-value", exchange);
+        int id = helper.validateUrlWithId("/update-value/42", "update-value", exchange);
         assertEquals(42, id);
         verify(exchange, never()).sendResponseHeaders(anyInt(), anyLong());
     }
 
     @Test
     void invalidUrlReturns404() throws Exception {
+        HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        int id = HandlerHelper.validateUrlWithId("/update/42", "update-value", exchange);
+        int id = helper.validateUrlWithId("/update/42", "update-value", exchange);
         assertEquals(-1, id);
         verify(exchange).sendResponseHeaders(404, -1);
     }
 
     @Test
     void invalidUrlMissingIdReturns404() throws Exception {
+        HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        int id = HandlerHelper.validateUrlWithId("/update-value", "update-value", exchange);
+        int id = helper.validateUrlWithId("/update-value", "update-value", exchange);
         verify(exchange).sendResponseHeaders(404, -1);
     }
 
     @Test
     void validRequestBodyReturnsValue() throws Exception {
+        HandlerHelper helper = new HandlerHelper() {};
         String json = "{\"value\":123.45}";
 
         when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream(json.getBytes()));
         when(objectMapper.readValue(anyString(), eq(ValueModel.class)))
                 .thenReturn(new ValueModel(BigDecimal.valueOf(123.45)));
 
-        ValueModel valueModel = HandlerHelper.parseRequestBody(exchange, objectMapper, ValueModel.class);
+        ValueModel valueModel = helper.parseRequestBody(exchange, objectMapper, ValueModel.class);
 
         Assertions.assertNotNull(valueModel);
         assertEquals(new BigDecimal("123.45"), valueModel.getValue());
@@ -213,13 +217,14 @@ public class UpdateProductHandlerTest {
     //Remove this is not specific to the handler
     @Test
     void invalidRequestBodyReturns400() throws Exception {
+        HandlerHelper helper = new HandlerHelper() {};
         String json = "{";
 
         when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream(json.getBytes()));
         when(objectMapper.readValue(anyString(), eq(ValueModel.class)))
                 .thenThrow(new RuntimeException("Invalid JSON"));
 
-        HandlerHelper.parseRequestBody(exchange, objectMapper, ValueModel.class);
+        helper.parseRequestBody(exchange, objectMapper, ValueModel.class);
 
         verify(exchange).sendResponseHeaders(400, -1);
     }
@@ -227,9 +232,10 @@ public class UpdateProductHandlerTest {
     //Remove this is not specific to the handler
     @Test
     void invalidRequestBodyMissingReturns400() throws Exception {
+        HandlerHelper helper = new HandlerHelper() {};
         when(exchange.getRequestBody()).thenReturn(null);
 
-        HandlerHelper.parseRequestBody(exchange, objectMapper, ValueModel.class);
+        helper.parseRequestBody(exchange, objectMapper, ValueModel.class);
 
         verify(exchange).sendResponseHeaders(400, -1);
     }
@@ -242,7 +248,7 @@ public class UpdateProductHandlerTest {
         headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
-        when(exchange.getRequestMethod()).thenReturn("POST");
+        when(exchange.getRequestMethod()).thenReturn("PATCH");
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(objectMapper.readValue(anyString(), eq(ValueModel.class)))
@@ -269,7 +275,7 @@ public class UpdateProductHandlerTest {
         headers.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
-        when(exchange.getRequestMethod()).thenReturn("POST");
+        when(exchange.getRequestMethod()).thenReturn("PATCH");
         when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(objectMapper.readValue(anyString(), eq(ValueModel.class)))

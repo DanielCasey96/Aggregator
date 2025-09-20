@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-public class RegistrationHandler implements HttpHandler {
+public class RegistrationHandler extends HandlerHelper implements HttpHandler {
 
     private final UsersServiceInterface usersServiceInterface;
     private final ObjectMapper objectMapper;
@@ -34,13 +34,13 @@ public class RegistrationHandler implements HttpHandler {
         }
 
         Map<String, Predicate<String>> requiredHeaders = new HashMap<>();
-        requiredHeaders.put("Accept", HandlerHelper.isJsonContentType());
-        if (!HandlerHelper.validateHeaders(exchange, requiredHeaders).isValid()) return;
+        requiredHeaders.put("Accept", isJsonContentType());
+        if (!validateHeaders(exchange, requiredHeaders).isValid()) return;
 
         String path = exchange.getRequestURI().getPath();
-        HandlerHelper.validateUrlNoId(path,"register", exchange);
+        validateUrlNoId(path,"register", exchange);
 
-        registrationRequestModel =  HandlerHelper.parseRequestBody(exchange, objectMapper, RegistrationRequestModel.class);
+        registrationRequestModel =  parseRequestBody(exchange, objectMapper, RegistrationRequestModel.class);
         if(registrationRequestModel == null) {
             exchange.sendResponseHeaders(400, -1);
             return;

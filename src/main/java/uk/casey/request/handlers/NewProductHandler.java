@@ -16,7 +16,7 @@ import uk.casey.models.ProductRequestModel;
 import uk.casey.request.services.ProductServiceInterface;
 import uk.casey.utils.JwtUtil;
 
-public class NewProductHandler implements HttpHandler {
+public class NewProductHandler extends HandlerHelper implements HttpHandler {
 
     private final ProductServiceInterface productServiceInterface;
     private final ObjectMapper objectMapper;
@@ -36,10 +36,10 @@ public class NewProductHandler implements HttpHandler {
         }
 
         Map<String, Predicate<String>> requiredHeaders = new HashMap<>();
-        requiredHeaders.put("User-Id", HandlerHelper.isUUID());
-        requiredHeaders.put("Content-Type", HandlerHelper.isJsonContentType());
-        requiredHeaders.put("Authorisation", HandlerHelper.anyValue());
-        HandlerHelper.HeaderValidationResult headerResult = HandlerHelper.validateHeaders(exchange, requiredHeaders);
+        requiredHeaders.put("User-Id", isUUID());
+        requiredHeaders.put("Content-Type", isJsonContentType());
+        requiredHeaders.put("Authorisation", anyValue());
+        HeaderValidationResult headerResult = validateHeaders(exchange, requiredHeaders);
         if (!headerResult.isValid()) return;
         UUID userId = UUID.fromString(headerResult.getValues().get("User-Id"));
 
@@ -51,10 +51,10 @@ public class NewProductHandler implements HttpHandler {
 
         // URL validation
         String path = exchange.getRequestURI().getPath();
-        HandlerHelper.validateUrlNoId(path, "add-product", exchange);
+        validateUrlNoId(path, "add-product", exchange);
 
         // Parse the request body
-        prm  = HandlerHelper.parseRequestBody(exchange, objectMapper, ProductRequestModel.class);
+        prm  = parseRequestBody(exchange, objectMapper, ProductRequestModel.class);
 
         try {
             productServiceInterface.createProductInDatabase(userId, prm.getName(), prm.getType(), prm.getProvider(), prm.getCategory(), prm.getValue(), prm.getUpdatedAt());

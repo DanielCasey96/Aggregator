@@ -13,7 +13,7 @@ import uk.casey.models.ProductsTableResponseModel;
 import uk.casey.request.services.ProductServiceInterface;
 import uk.casey.utils.JwtUtil;
 
-public class RetrievalHandler implements HttpHandler {
+public class RetrievalHandler extends HandlerHelper implements HttpHandler {
 
     private final ProductServiceInterface productServiceInterface;
     private final ObjectMapper objectMapper;
@@ -32,10 +32,10 @@ public class RetrievalHandler implements HttpHandler {
         }
 
         Map<String, Predicate<String>> requiredHeaders = new HashMap<>();
-        requiredHeaders.put("User-Id", HandlerHelper.isUUID());
-        requiredHeaders.put("Content-Type", HandlerHelper.isJsonContentType());
-        requiredHeaders.put("Authorisation", HandlerHelper.anyValue());
-        HandlerHelper.HeaderValidationResult headerResult = HandlerHelper.validateHeaders(exchange, requiredHeaders);
+        requiredHeaders.put("User-Id", isUUID());
+        requiredHeaders.put("Content-Type", isJsonContentType());
+        requiredHeaders.put("Authorisation", anyValue());
+        HeaderValidationResult headerResult = validateHeaders(exchange, requiredHeaders);
         if (!headerResult.isValid()) return;
         UUID userId = UUID.fromString(headerResult.getValues().get("User-Id"));
 
@@ -47,7 +47,7 @@ public class RetrievalHandler implements HttpHandler {
 
         // URL validation
         String path = exchange.getRequestURI().getPath();
-        HandlerHelper.validateUrlNoId(path, "accounts", exchange);
+        validateUrlNoId(path, "accounts", exchange);
 
         // Make GET call to DB to determine current state of Data
         List<ProductsTableResponseModel> dbResponse; 

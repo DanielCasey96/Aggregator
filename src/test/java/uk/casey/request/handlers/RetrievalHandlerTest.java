@@ -165,8 +165,9 @@ public class RetrievalHandlerTest {
     //Remove this is not specific to the handler
     @Test
     void validUrlReturnsSuccess() throws Exception {
+        HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        boolean result = HandlerHelper.validateUrlNoId("/accounts", "accounts", exchange);
+        boolean result = helper.validateUrlNoId("/accounts", "accounts", exchange);
         assertEquals(true, result);
         verify(exchange, never()).sendResponseHeaders(anyInt(), anyLong());
     }
@@ -174,8 +175,9 @@ public class RetrievalHandlerTest {
     //Remove this is not specific to the handler
     @Test
     void invalidUrlReturns404() throws Exception {
+        HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        boolean result = HandlerHelper.validateUrlNoId("/update/42/145", "update-value", exchange);
+        boolean result = helper.validateUrlNoId("/update/42/145", "update-value", exchange);
         verify(exchange).sendResponseHeaders(404, -1);
         assertEquals(false, result);
     }

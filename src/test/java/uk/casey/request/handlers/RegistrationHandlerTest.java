@@ -156,8 +156,9 @@ public class RegistrationHandlerTest {
     @Tag("unit-integration")
     @Test
     void validUrlReturnsSuccess() throws Exception {
+        HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        boolean result = HandlerHelper.validateUrlNoId("/register", "register", exchange);
+        boolean result = helper.validateUrlNoId("/register", "register", exchange);
         assertEquals(true, result);
         verify(exchange, never()).sendResponseHeaders(anyInt(), anyLong());
     }

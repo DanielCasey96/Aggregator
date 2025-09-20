@@ -18,7 +18,6 @@ import uk.casey.request.services.ProductService;
 import uk.casey.request.services.UsersService;
 import uk.casey.request.services.ProductServiceInterface;
 import uk.casey.request.services.UsersServiceInterface;
-import uk.casey.utils.JwtUtil;
 
 public class AggregateController {
 
