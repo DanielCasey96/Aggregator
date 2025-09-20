@@ -28,10 +28,7 @@ public class RegistrationHandler extends HandlerHelper implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         RegistrationRequestModel registrationRequestModel;
 
-        if (!"POST".equals(exchange.getRequestMethod())) {
-            exchange.sendResponseHeaders(405, -1);
-            return;
-        }
+        if(!methodValidation(exchange, "POST")) return;
 
         Map<String, Predicate<String>> requiredHeaders = new HashMap<>();
         requiredHeaders.put("Accept", isJsonContentType());

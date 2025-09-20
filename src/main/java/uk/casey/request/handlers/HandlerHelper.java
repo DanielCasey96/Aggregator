@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
+import uk.casey.utils.JwtUtil;
 
 abstract class HandlerHelper {
 
@@ -18,6 +19,14 @@ abstract class HandlerHelper {
         if(actualMethod == null || !expectedMethod.equalsIgnoreCase(actualMethod)) {
             exchange.sendResponseHeaders(405, -1);
             System.out.println("Incorrect Method Type");
+            return false;
+        }
+        return true;
+    }
+
+    protected boolean tokenHandling(HttpExchange exchange, String token) throws IOException {
+        if(!JwtUtil.validateToken(token)) {
+            exchange.sendResponseHeaders(401, -1);
             return false;
         }
         return true;

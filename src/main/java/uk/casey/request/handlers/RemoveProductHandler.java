@@ -24,10 +24,8 @@ public class RemoveProductHandler extends HandlerHelper implements HttpHandler {
 
      @Override
      public void handle(HttpExchange exchange) throws IOException {
-         if (!"DELETE".equals(exchange.getRequestMethod())) {
-             exchange.sendResponseHeaders(405, -1); // Method Not Allowed
-             return;
-         }
+
+         if(!methodValidation(exchange, "DELETE")) return;
 
          Map<String, Predicate<String>> requiredHeaders = new HashMap<>();
          requiredHeaders.put("User-Id", isUUID());
@@ -37,11 +35,7 @@ public class RemoveProductHandler extends HandlerHelper implements HttpHandler {
          if (!headerResult.isValid()) return;
          UUID userId = UUID.fromString(headerResult.getValues().get("User-Id"));
 
-         String token = headerResult.getValues().get("Authorisation");
-         if (!JwtUtil.validateToken(token)) {
-             exchange.sendResponseHeaders(401, -1);
-             return;
-         }
+         if(!tokenHandling(exchange, headerResult.getValues().get("Authorisation"))) return;
 
          // URL validation
          String path = exchange.getRequestURI().getPath();

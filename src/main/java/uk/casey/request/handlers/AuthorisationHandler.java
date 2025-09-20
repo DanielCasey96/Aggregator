@@ -32,18 +32,14 @@ public class AuthorisationHandler extends HandlerHelper implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         LoginRequestModel loginRequestModel;
 
-        if (!"POST".equals(exchange.getRequestMethod())) {
-            exchange.sendResponseHeaders(405, -1);
-            return;
-        }
+        if(!methodValidation(exchange, "POST")) return;
 
         Map<String, Predicate<String>> requiredHeaders = new HashMap<>();
         requiredHeaders.put("User-Id", isUUID());
         requiredHeaders.put("Content-Type", isJsonContentType());
         HeaderValidationResult headerResult = validateHeaders(exchange, requiredHeaders);
-        if (!headerResult.isValid()) {
-            return;
-        }
+        if (!headerResult.isValid()) return;
+
         UUID userId = UUID.fromString(headerResult.getValues().get("User-Id"));
 
         String path = exchange.getRequestURI().getPath();

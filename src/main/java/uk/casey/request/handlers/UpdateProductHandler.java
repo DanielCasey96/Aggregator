@@ -29,6 +29,7 @@ public class UpdateProductHandler extends HandlerHelper implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
+
         if(!methodValidation(exchange, "PATCH")) return;
 
         // Header validation
@@ -40,11 +41,7 @@ public class UpdateProductHandler extends HandlerHelper implements HttpHandler {
         if (!headerResult.isValid()) return;
         UUID userId = UUID.fromString(headerResult.getValues().get("User-Id"));
 
-        String token = headerResult.getValues().get("Authorisation");
-        if (!JwtUtil.validateToken(token)) {
-            exchange.sendResponseHeaders(401, -1);
-            return;
-        }
+        if(!tokenHandling(exchange, headerResult.getValues().get("Authorisation"))) return;
 
         // URL validation
         String path = exchange.getRequestURI().getPath();
