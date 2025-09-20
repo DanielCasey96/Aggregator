@@ -40,9 +40,7 @@ public class RemoveProductHandler extends HandlerHelper implements HttpHandler {
          // URL validation
          String path = exchange.getRequestURI().getPath();
          int id = validateUrlWithId(path, "remove-product", exchange);
-         if (id == -1) {
-             return;
-         }
+         if (id == -1) return;
 
          try {
              productServiceInterface.removeProductFromDatabase(userId, id);

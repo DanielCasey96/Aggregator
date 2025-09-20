@@ -44,11 +44,8 @@ public class UpdateProductHandler extends HandlerHelper implements HttpHandler {
         if(!tokenHandling(exchange, headerResult.getValues().get("Authorisation"))) return;
 
         // URL validation
-        String path = exchange.getRequestURI().getPath();
-        int id = validateUrlWithId(path, "update-value", exchange);
-        if (id == -1) {
-            return;
-        }
+        int id = validateUrlWithId(exchange.getRequestURI().getPath(), "update-value", exchange);
+        if (id == -1) return;
 
         // Parse the request body
         ValueModel valueModel = parseRequestBody(exchange, objectMapper, ValueModel.class);

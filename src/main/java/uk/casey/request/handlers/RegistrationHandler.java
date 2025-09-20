@@ -34,11 +34,9 @@ public class RegistrationHandler extends HandlerHelper implements HttpHandler {
         requiredHeaders.put("Accept", isJsonContentType());
         if (!validateHeaders(exchange, requiredHeaders).isValid()) return;
 
-        String path = exchange.getRequestURI().getPath();
-        validateUrlNoId(path,"register", exchange);
+        validateUrlNoId(exchange.getRequestURI().getPath(),"register", exchange);
 
-        registrationRequestModel =  parseRequestBody(exchange, objectMapper, RegistrationRequestModel.class);
-        if(registrationRequestModel == null) {
+        if(parseRequestBody(exchange, objectMapper, RegistrationRequestModel.class) == null) {
             exchange.sendResponseHeaders(400, -1);
             return;
         }

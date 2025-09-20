@@ -39,17 +39,11 @@ public class AuthorisationHandler extends HandlerHelper implements HttpHandler {
         requiredHeaders.put("Content-Type", isJsonContentType());
         HeaderValidationResult headerResult = validateHeaders(exchange, requiredHeaders);
         if (!headerResult.isValid()) return;
-
         UUID userId = UUID.fromString(headerResult.getValues().get("User-Id"));
 
-        String path = exchange.getRequestURI().getPath();
-        boolean validUrl = validateUrlNoId(path, "authorise", exchange);
-        if(!validUrl) {
-            exchange.sendResponseHeaders(404, -1);
-        }
+        if(!validateUrlNoId(exchange.getRequestURI().getPath(), "authorise", exchange)) return;
 
-        loginRequestModel = parseRequestBody(exchange, objectMapper, LoginRequestModel.class);
-        if (loginRequestModel == null) {
+        if (parseRequestBody(exchange, objectMapper, LoginRequestModel.class) == null) {
             exchange.sendResponseHeaders(400, -1);
             return;
         }
