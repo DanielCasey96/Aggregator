@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -14,14 +13,13 @@ import com.sun.net.httpserver.HttpHandler;
 
 import uk.casey.models.ProductRequestModel;
 import uk.casey.request.services.ProductServiceInterface;
-import uk.casey.utils.JwtUtil;
 
-public class NewProductHandler extends HandlerHelper implements HttpHandler {
+public class CreateProductHandler extends HandlerHelper implements HttpHandler {
 
     private final ProductServiceInterface productServiceInterface;
     private final ObjectMapper objectMapper;
 
-    public NewProductHandler(ProductServiceInterface productServiceInterface, ObjectMapper objectMapper) {
+    public CreateProductHandler(ProductServiceInterface productServiceInterface, ObjectMapper objectMapper) {
         this.productServiceInterface = productServiceInterface;
         this.objectMapper = objectMapper;
     }

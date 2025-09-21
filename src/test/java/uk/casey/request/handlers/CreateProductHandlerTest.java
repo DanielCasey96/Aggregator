@@ -5,8 +5,6 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Locale;
-import java.util.Properties;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,12 +28,11 @@ import static org.mockito.Mockito.mockStatic;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 
-import uk.casey.models.LoginRequestModel;
 import uk.casey.models.ProductRequestModel;
 import uk.casey.request.services.ProductServiceInterface;
 import uk.casey.utils.JwtUtil;
 
-public class NewProductHandlerTest {
+public class CreateProductHandlerTest {
     private HttpExchange exchange;
     private ProductServiceInterface productServiceInterface;
     private JwtUtil jwtUtil;
@@ -95,7 +92,7 @@ public class NewProductHandlerTest {
                     any(BigDecimal.class), any(Timestamp.class)
             )).thenReturn(true);
 
-            NewProductHandler handler = new NewProductHandler(productServiceInterface, objectMapper);
+            CreateProductHandler handler = new CreateProductHandler(productServiceInterface, objectMapper);
             handler.handle(exchange);
 
             verify(exchange).getRequestMethod();
@@ -150,7 +147,7 @@ public class NewProductHandlerTest {
                     any(BigDecimal.class), any(Timestamp.class)
             )).thenReturn(true);
 
-            NewProductHandler handler = new NewProductHandler(productServiceInterface, objectMapper);
+            CreateProductHandler handler = new CreateProductHandler(productServiceInterface, objectMapper);
             handler.handle(exchange);
 
             verify(responseBody).flush();
@@ -163,7 +160,7 @@ public class NewProductHandlerTest {
     void returns405ForNonPostMethod() throws Exception {
         when(exchange.getRequestMethod()).thenReturn("GET");
 
-        NewProductHandler handler = new NewProductHandler(productServiceInterface, objectMapper);
+        CreateProductHandler handler = new CreateProductHandler(productServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).getRequestMethod();
@@ -180,7 +177,7 @@ public class NewProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        NewProductHandler handler = new NewProductHandler(productServiceInterface, objectMapper);
+        CreateProductHandler handler = new CreateProductHandler(productServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -196,7 +193,7 @@ public class NewProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        NewProductHandler handler = new NewProductHandler(productServiceInterface, objectMapper);
+        CreateProductHandler handler = new CreateProductHandler(productServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -211,7 +208,7 @@ public class NewProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        NewProductHandler handler = new NewProductHandler(productServiceInterface, objectMapper);
+        CreateProductHandler handler = new CreateProductHandler(productServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -227,7 +224,7 @@ public class NewProductHandlerTest {
         when(exchange.getRequestMethod()).thenReturn("POST");
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        NewProductHandler handler = new NewProductHandler(productServiceInterface, objectMapper);
+        CreateProductHandler handler = new CreateProductHandler(productServiceInterface, objectMapper);
         handler.handle(exchange);
 
         verify(exchange).sendResponseHeaders(400, -1);
@@ -294,7 +291,7 @@ public class NewProductHandlerTest {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
 
-            NewProductHandler handler = new NewProductHandler(productServiceInterface, objectMapper);
+            CreateProductHandler handler = new CreateProductHandler(productServiceInterface, objectMapper);
             handler.handle(exchange);
 
             verify(exchange).sendResponseHeaders(500, -1);
@@ -344,7 +341,7 @@ public class NewProductHandlerTest {
             String token = headers.getFirst("Authorisation");
             jwtUtilMock.when(() -> JwtUtil.validateToken(token)).thenReturn(true);
 
-            NewProductHandler handler = new NewProductHandler(productServiceInterface, objectMapper);
+            CreateProductHandler handler = new CreateProductHandler(productServiceInterface, objectMapper);
             handler.handle(exchange);
 
             verify(exchange).sendResponseHeaders(500, -1);

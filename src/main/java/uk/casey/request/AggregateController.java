@@ -9,9 +9,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
 
 import uk.casey.request.handlers.AuthorisationHandler;
-import uk.casey.request.handlers.NewProductHandler;
+import uk.casey.request.handlers.CreateProductHandler;
 import uk.casey.request.handlers.RegistrationHandler;
-import uk.casey.request.handlers.RemoveProductHandler;
+import uk.casey.request.handlers.DeleteProductHandler;
 import uk.casey.request.handlers.RetrievalHandler;
 import uk.casey.request.handlers.UpdateProductHandler;
 import uk.casey.request.services.ProductService;
@@ -32,9 +32,9 @@ public class AggregateController {
 
         HttpServer httpServer = HttpServer.create(new InetSocketAddress("localhost", 8080), 0);
         httpServer.createContext("/products/retrieve", new RetrievalHandler(productServiceInterface, objectMapper));
-        httpServer.createContext("/product/create", new NewProductHandler(productServiceInterface, objectMapper));
+        httpServer.createContext("/product/create", new CreateProductHandler(productServiceInterface, objectMapper));
         httpServer.createContext("/product/update", new UpdateProductHandler(productServiceInterface, objectMapper));
-        httpServer.createContext("/product/remove", new RemoveProductHandler(productServiceInterface));
+        httpServer.createContext("/product/remove", new DeleteProductHandler(productServiceInterface));
         httpServer.createContext("/user/register", new RegistrationHandler(usersServiceInterface, objectMapper));
         httpServer.createContext("/user/authorise", new AuthorisationHandler(usersServiceInterface , objectMapper));
         httpServer.setExecutor(Executors.newFixedThreadPool(10)); // Remove if hosting on lambda
