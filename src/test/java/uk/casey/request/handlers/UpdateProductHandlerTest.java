@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 import uk.casey.request.services.ProductServiceInterface;
 import uk.casey.utils.JwtUtil;
 
-public class UpdateProductHandlerTest {
+class UpdateProductHandlerTest {
 
     private HttpExchange exchange;
     private ProductServiceInterface productServiceInterface;

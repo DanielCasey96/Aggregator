@@ -14,7 +14,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import java.util.Properties;
 
-public class UsersServiceTest {
+class UsersServiceTest {
 
     @Test
     void registerUserToDatabase_success() throws Exception {

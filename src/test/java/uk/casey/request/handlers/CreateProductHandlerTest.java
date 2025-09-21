@@ -32,7 +32,7 @@ import uk.casey.models.ProductRequestModel;
 import uk.casey.request.services.ProductServiceInterface;
 import uk.casey.utils.JwtUtil;
 
-public class CreateProductHandlerTest {
+class CreateProductHandlerTest {
     private HttpExchange exchange;
     private ProductServiceInterface productServiceInterface;
     private JwtUtil jwtUtil;

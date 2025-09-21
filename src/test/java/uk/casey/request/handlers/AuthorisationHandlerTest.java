@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 
-public class AuthorisationHandlerTest {
+class AuthorisationHandlerTest {
 
     private HttpExchange exchange;
     private UsersServiceInterface usersServiceInterface;

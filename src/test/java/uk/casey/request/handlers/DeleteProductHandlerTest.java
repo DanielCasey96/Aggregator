@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class DeleteProductHandlerTest {
+class DeleteProductHandlerTest {
 
     private HttpExchange exchange;
     private ProductServiceInterface productServiceInterface;

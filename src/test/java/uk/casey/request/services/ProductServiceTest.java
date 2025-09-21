@@ -18,7 +18,7 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.List;
 
-public class ProductServiceTest {
+class ProductServiceTest {
 
     @Test
     void retrieveProductsFromDatabase_returnsProducts() throws Exception {
