@@ -49,7 +49,7 @@ public class AuthorisationHandlerTest {
                 """;
 
         when(exchange.getRequestMethod()).thenReturn("POST");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/authorise"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/user/authorise"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
@@ -84,7 +84,7 @@ public class AuthorisationHandlerTest {
                 """;
 
         when(exchange.getRequestMethod()).thenReturn("POST");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/authorise"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/user/authorise"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         OutputStream responseBody = mock(OutputStream.class);
@@ -189,7 +189,7 @@ public class AuthorisationHandlerTest {
                 """;
 
         when(exchange.getRequestMethod()).thenReturn("POST");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/authorise"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/user/authorise"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
@@ -220,7 +220,7 @@ public class AuthorisationHandlerTest {
                 """;
 
         when(exchange.getRequestMethod()).thenReturn("POST");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/authorise"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/user/authorise"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));

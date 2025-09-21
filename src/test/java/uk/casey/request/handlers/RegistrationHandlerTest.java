@@ -53,7 +53,7 @@ public class RegistrationHandlerTest {
                 """;
 
         when(exchange.getRequestMethod()).thenReturn("POST");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/register"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/user/register"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         when(objectMapper.readValue(anyString(), eq(RegistrationRequestModel.class)))
@@ -90,7 +90,7 @@ public class RegistrationHandlerTest {
                 """;
 
         when(exchange.getRequestMethod()).thenReturn("POST");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/register"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/user/register"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         when(objectMapper.readValue(anyString(), eq(RegistrationRequestModel.class)))
@@ -158,7 +158,7 @@ public class RegistrationHandlerTest {
     void validUrlReturnsSuccess() throws Exception {
         HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        boolean result = helper.validateUrlNoId("/register", "register", exchange);
+        boolean result = helper.validateUrlNoId("/user/register", "register", exchange);
         assertEquals(true, result);
         verify(exchange, never()).sendResponseHeaders(anyInt(), anyLong());
     }
@@ -176,7 +176,7 @@ public class RegistrationHandlerTest {
             }
             """;
         when(exchange.getRequestMethod()).thenReturn("POST");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/register"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/user/register"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         when(objectMapper.readValue(anyString(), eq(RegistrationRequestModel.class)))
@@ -222,7 +222,7 @@ public class RegistrationHandlerTest {
             );
 
             when(exchange.getRequestMethod()).thenReturn("POST");
-            when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/register"));
+            when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/user/register"));
             when(exchange.getRequestHeaders()).thenReturn(headers);
             when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
             when(objectMapper.readValue(anyString(), eq(RegistrationRequestModel.class)))
@@ -265,7 +265,7 @@ public class RegistrationHandlerTest {
                 """;
 
         when(exchange.getRequestMethod()).thenReturn("POST");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/register"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/user/register"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         when(objectMapper.readValue(anyString(), eq(RegistrationRequestModel.class)))
@@ -299,7 +299,7 @@ public class RegistrationHandlerTest {
                 """;
 
         when(exchange.getRequestMethod()).thenReturn("POST");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/register"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/user/register"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         when(objectMapper.readValue(anyString(), eq(RegistrationRequestModel.class)))

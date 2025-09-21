@@ -51,7 +51,7 @@ public class UpdateProductHandlerTest {
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("PATCH");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/product/update/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(objectMapper.readValue(anyString(), eq(ValueModel.class)))
                 .thenReturn(new ValueModel(BigDecimal.valueOf(123.45)));
@@ -79,7 +79,7 @@ public class UpdateProductHandlerTest {
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("PATCH");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/product/update/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(objectMapper.readValue(anyString(), eq(ValueModel.class)))
                 .thenReturn(new ValueModel(BigDecimal.valueOf(123.45)));
@@ -177,7 +177,7 @@ public class UpdateProductHandlerTest {
     void validUrlReturnsId() throws Exception {
         HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        int id = helper.validateUrlWithId("/update-value/42", "update-value", exchange);
+        int id = helper.validateUrlWithId("/product/update/42", "update", exchange);
         assertEquals(42, id);
         verify(exchange, never()).sendResponseHeaders(anyInt(), anyLong());
     }
@@ -186,7 +186,7 @@ public class UpdateProductHandlerTest {
     void invalidUrlReturns404() throws Exception {
         HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        int id = helper.validateUrlWithId("/update/42", "update-value", exchange);
+        int id = helper.validateUrlWithId("/product/chicken/42", "update", exchange);
         assertEquals(-1, id);
         verify(exchange).sendResponseHeaders(404, -1);
     }
@@ -195,7 +195,7 @@ public class UpdateProductHandlerTest {
     void invalidUrlMissingIdReturns404() throws Exception {
         HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        int id = helper.validateUrlWithId("/update-value", "update-value", exchange);
+        int id = helper.validateUrlWithId("/product/update", "update", exchange);
         verify(exchange).sendResponseHeaders(404, -1);
     }
 
@@ -249,7 +249,7 @@ public class UpdateProductHandlerTest {
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("PATCH");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/product/update/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(objectMapper.readValue(anyString(), eq(ValueModel.class)))
                 .thenReturn(new ValueModel(BigDecimal.valueOf(123.45)));
@@ -276,7 +276,7 @@ public class UpdateProductHandlerTest {
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("PATCH");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/update-value/1"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/product/update/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(objectMapper.readValue(anyString(), eq(ValueModel.class)))
                 .thenReturn(new ValueModel(BigDecimal.valueOf(123.45)));

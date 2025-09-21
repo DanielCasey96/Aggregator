@@ -43,7 +43,7 @@ public class NewProductHandler extends HandlerHelper implements HttpHandler {
         if(!tokenHandling(exchange, headerResult.getValues().get("Authorisation"))) return;
 
         // URL validation
-        if(!validateUrlNoId(exchange.getRequestURI().getPath(), "add-product", exchange)) return;
+        if(!validateUrlNoId(exchange.getRequestURI().getPath(), "create", exchange)) return;
 
         // Parse the request body
         prm  = parseRequestBody(exchange, objectMapper, ProductRequestModel.class);

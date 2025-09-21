@@ -70,7 +70,7 @@ public class NewProductHandlerTest {
     """;
 
         when(exchange.getRequestMethod()).thenReturn("POST");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/add-product"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/product/create"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
@@ -125,7 +125,7 @@ public class NewProductHandlerTest {
                 """;
 
         when(exchange.getRequestMethod()).thenReturn("POST");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/add-product"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/product/create"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         when(objectMapper.readValue(anyString(), eq(ProductRequestModel.class)))
@@ -237,7 +237,7 @@ public class NewProductHandlerTest {
     void validUrlReturnsSuccess() throws Exception {
         HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        boolean result = helper.validateUrlNoId("/add-product", "add-product", exchange);
+        boolean result = helper.validateUrlNoId("/product/create", "create", exchange);
         assertEquals(true, result);
         verify(exchange, never()).sendResponseHeaders(anyInt(), anyLong());
     }
@@ -246,7 +246,7 @@ public class NewProductHandlerTest {
     void invalidUrlReturns404() throws Exception {
         HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        boolean result = helper.validateUrlNoId("/add-product/chicken", "add-product", exchange);
+        boolean result = helper.validateUrlNoId("/product/chicken", "create", exchange);
         verify(exchange).sendResponseHeaders(404, -1);
         assertEquals(false, result);
     }
@@ -272,7 +272,7 @@ public class NewProductHandlerTest {
     """;
 
         when(exchange.getRequestMethod()).thenReturn("POST");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/add-product"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/product/create"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         when(objectMapper.readValue(anyString(), eq(ProductRequestModel.class)))
@@ -322,7 +322,7 @@ public class NewProductHandlerTest {
     """;
 
         when(exchange.getRequestMethod()).thenReturn("POST");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/add-product"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/product/create"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(json.getBytes()));
         when(objectMapper.readValue(anyString(), eq(ProductRequestModel.class)))

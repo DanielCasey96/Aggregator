@@ -31,12 +31,12 @@ public class AggregateController {
         ObjectMapper objectMapper = new ObjectMapper();
 
         HttpServer httpServer = HttpServer.create(new InetSocketAddress("localhost", 8080), 0);
-        httpServer.createContext("/add-product", new NewProductHandler(productServiceInterface, objectMapper));
-        httpServer.createContext("/accounts", new RetrievalHandler(productServiceInterface, objectMapper));
-        httpServer.createContext("/update-value", new UpdateProductHandler(productServiceInterface, objectMapper));
-        httpServer.createContext("/remove-product", new RemoveProductHandler(productServiceInterface));
-        httpServer.createContext("/register", new RegistrationHandler(usersServiceInterface, objectMapper));
-        httpServer.createContext("/authorise", new AuthorisationHandler(usersServiceInterface , objectMapper));
+        httpServer.createContext("/products/retrieve", new RetrievalHandler(productServiceInterface, objectMapper));
+        httpServer.createContext("/product/create", new NewProductHandler(productServiceInterface, objectMapper));
+        httpServer.createContext("/product/update", new UpdateProductHandler(productServiceInterface, objectMapper));
+        httpServer.createContext("/product/remove", new RemoveProductHandler(productServiceInterface));
+        httpServer.createContext("/user/register", new RegistrationHandler(usersServiceInterface, objectMapper));
+        httpServer.createContext("/user/authorise", new AuthorisationHandler(usersServiceInterface , objectMapper));
         httpServer.setExecutor(Executors.newFixedThreadPool(10)); // Remove if hosting on lambda
         httpServer.start();
     }

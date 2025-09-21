@@ -39,7 +39,7 @@ public class RetrievalHandler extends HandlerHelper implements HttpHandler {
         if(!tokenHandling(exchange, headerResult.getValues().get("Authorisation"))) return;
 
         // URL validation
-        if(!validateUrlNoId(exchange.getRequestURI().getPath(), "accounts", exchange)) return;
+        if(!validateUrlNoId(exchange.getRequestURI().getPath(), "retrieve", exchange)) return;
 
         // Make GET call to DB to determine current state of Data
         List<ProductsTableResponseModel> dbResponse; 

@@ -45,7 +45,7 @@ public class RetrievalHandlerTest {
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("GET");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/accounts"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/products/retrieve"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
         when(objectMapper.writeValueAsString(any())).thenReturn("[]");
@@ -71,7 +71,7 @@ public class RetrievalHandlerTest {
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("GET");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/accounts"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/products/retrieve"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         OutputStream responseBody = mock(OutputStream.class);
         when(exchange.getResponseBody()).thenReturn(responseBody);
@@ -167,7 +167,7 @@ public class RetrievalHandlerTest {
     void validUrlReturnsSuccess() throws Exception {
         HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        boolean result = helper.validateUrlNoId("/accounts", "accounts", exchange);
+        boolean result = helper.validateUrlNoId("/products/retrieve", "retrieve", exchange);
         assertEquals(true, result);
         verify(exchange, never()).sendResponseHeaders(anyInt(), anyLong());
     }
@@ -177,7 +177,7 @@ public class RetrievalHandlerTest {
     void invalidUrlReturns404() throws Exception {
         HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        boolean result = helper.validateUrlNoId("/update/42/145", "update-value", exchange);
+        boolean result = helper.validateUrlNoId("/products/42/45", "retrieve", exchange);
         verify(exchange).sendResponseHeaders(404, -1);
         assertEquals(false, result);
     }
@@ -190,7 +190,7 @@ public class RetrievalHandlerTest {
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("GET");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/accounts"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/products/retrieve"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
         when(objectMapper.writeValueAsString(any())).thenReturn("[]");
@@ -214,7 +214,7 @@ public class RetrievalHandlerTest {
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("GET");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/accounts"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/products/retrieve"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
         when(objectMapper.writeValueAsString(any())).thenReturn("[]");

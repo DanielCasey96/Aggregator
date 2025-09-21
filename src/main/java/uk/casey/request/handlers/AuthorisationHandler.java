@@ -43,7 +43,8 @@ public class AuthorisationHandler extends HandlerHelper implements HttpHandler {
 
         if(!validateUrlNoId(exchange.getRequestURI().getPath(), "authorise", exchange)) return;
 
-        if (parseRequestBody(exchange, objectMapper, LoginRequestModel.class) == null) {
+        loginRequestModel = parseRequestBody(exchange, objectMapper, LoginRequestModel.class);
+        if (loginRequestModel == null) {
             exchange.sendResponseHeaders(400, -1);
             return;
         }

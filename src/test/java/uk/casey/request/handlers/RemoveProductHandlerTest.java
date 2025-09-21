@@ -42,7 +42,7 @@ public class RemoveProductHandlerTest {
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("DELETE");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/remove-product/1"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/product/remove/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
 
@@ -69,7 +69,7 @@ public class RemoveProductHandlerTest {
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("DELETE");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/remove-product/1"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/product/remove/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
         OutputStream responseBody = mock(OutputStream.class);
@@ -166,7 +166,7 @@ public class RemoveProductHandlerTest {
     void validUrlReturnsId() throws Exception {
         HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        int id = helper.validateUrlWithId("/remove-product/42", "remove-product", exchange);
+        int id = helper.validateUrlWithId("/product/remove/42", "remove", exchange);
         assertEquals(42, id);
         verify(exchange, never()).sendResponseHeaders(anyInt(), anyLong());
     }
@@ -176,7 +176,7 @@ public class RemoveProductHandlerTest {
     void invalidUrlReturns404() throws Exception {
         HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        int id = helper.validateUrlWithId("/remove/chicken/1", "remove-product", exchange);
+        int id = helper.validateUrlWithId("/product/chicken/1", "remove", exchange);
         assertEquals(-1, id);
         verify(exchange).sendResponseHeaders(404, -1);
     }
@@ -186,7 +186,7 @@ public class RemoveProductHandlerTest {
     void invalidUrlMissingIdReturns404() throws Exception {
         HandlerHelper helper = new HandlerHelper() {};
         HttpExchange exchange = mock(HttpExchange.class);
-        int id = helper.validateUrlWithId("/remove-product", "remove-product", exchange);
+        int id = helper.validateUrlWithId("/product/remove", "remove", exchange);
         verify(exchange).sendResponseHeaders(404, -1);
     }
 
@@ -199,7 +199,7 @@ public class RemoveProductHandlerTest {
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("DELETE");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/remove-product/1"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/product/remove/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
         doThrow(new SQLException("DB error SQL")).when(productServiceInterface).removeProductFromDatabase(any(UUID.class), anyInt());
@@ -225,7 +225,7 @@ public class RemoveProductHandlerTest {
         headers.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MTEyMGFiZi0zMzlkLTQ2MjctODE4OC0xZTI0ZTc3NTk0NzUiLCJ1c2VybmFtZSI6ImNhc2V5MmJvb2dhbG9vIiwiaWF0IjoxNzU3NzA5NzQ5LCJleHAiOjE3NTc3MDk4Njl9.03sPM5GMx0y0SI0H133ng4EhPdCqjDgv6loU-Q-zVqU");
 
         when(exchange.getRequestMethod()).thenReturn("DELETE");
-        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/remove-product/1"));
+        when(exchange.getRequestURI()).thenReturn(java.net.URI.create("/product/remove/1"));
         when(exchange.getRequestHeaders()).thenReturn(headers);
         when(exchange.getResponseBody()).thenReturn(mock(OutputStream.class));
         doThrow(new IOException("DB error IO")).when(productServiceInterface).removeProductFromDatabase(any(UUID.class), anyInt());

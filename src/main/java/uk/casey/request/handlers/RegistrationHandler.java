@@ -36,7 +36,8 @@ public class RegistrationHandler extends HandlerHelper implements HttpHandler {
 
         validateUrlNoId(exchange.getRequestURI().getPath(),"register", exchange);
 
-        if(parseRequestBody(exchange, objectMapper, RegistrationRequestModel.class) == null) {
+        registrationRequestModel =  parseRequestBody(exchange, objectMapper, RegistrationRequestModel.class);
+        if(registrationRequestModel == null) {
             exchange.sendResponseHeaders(400, -1);
             return;
         }
