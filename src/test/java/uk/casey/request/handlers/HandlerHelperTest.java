@@ -1,6 +1,7 @@
 package uk.casey.request.handlers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,10 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 class HandlerHelperTest {
     private HttpExchange exchange;
@@ -36,7 +40,7 @@ class HandlerHelperTest {
     }
 
     @Test
-    void methodValidationReturnsFalseForMethodMissmatch() throws IOException {
+    void methodValidationReturnsFalseForMethodMissMatch() throws IOException {
         String passedMethod = "PATCH";
         when(exchange.getRequestMethod()).thenReturn("GET");
 
@@ -264,6 +268,94 @@ class HandlerHelperTest {
 
         assertNull(handlerHelper.parseRequestBody(exchange, objectMapper, ProductRequestModel.class));
         verify(exchange).sendResponseHeaders(400, -1);
+    }
+
+    @Test
+    void validateHeadersReturnsSuccess() throws IOException {
+        Map<String,Predicate<String>> passedHeaders = new HashMap<>();
+        passedHeaders.put("User-Id", handlerHelper.isUUID());
+        passedHeaders.put("Content-Type", handlerHelper.isJsonContentType());
+        passedHeaders.put("Authorisation", handlerHelper.anyValue());
+
+        Headers mockedHeaders = new Headers();
+        mockedHeaders.add("Content-Type", "application/json");
+        mockedHeaders.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
+        mockedHeaders.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eN");
+
+        when(exchange.getRequestHeaders()).thenReturn(mockedHeaders);
+
+        HandlerHelper.HeaderValidationResult response = handlerHelper.validateHeaders(exchange, passedHeaders);
+
+        assertTrue(response.isValid());
+
+        Map<String, String> values = response.getValues();
+        assertNotNull(values);
+        assertEquals(3, values.size());
+        assertEquals("123e4567-e89b-12d3-a456-426614174000", values.get("User-Id"));
+        assertEquals("application/json", values.get("Content-Type"));
+        assertEquals("eyJhbGciOiJIUzI1NiJ9.eN", values.get("Authorisation"));
+    }
+
+    @Test
+    void validateHeadersReturnsFailureWhenRequiredHeaderIsNotPresent() throws IOException {
+        Map<String,Predicate<String>> passedHeaders = new HashMap<>();
+        passedHeaders.put("User-Id", handlerHelper.isUUID());
+        passedHeaders.put("Content-Type", handlerHelper.isJsonContentType());
+        passedHeaders.put("Authorisation", handlerHelper.anyValue());
+
+        Headers mockedHeaders = new Headers();
+        mockedHeaders.add("Content-Type", "application/json");
+        mockedHeaders.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eN");
+
+        when(exchange.getRequestHeaders()).thenReturn(mockedHeaders);
+
+        HandlerHelper.HeaderValidationResult response = handlerHelper.validateHeaders(exchange, passedHeaders);
+
+        assertFalse(response.isValid());
+        assertNull(response.getValues());
+        exchange.sendResponseHeaders(400, -1);
+    }
+
+    @Test
+    void validateHeadersReturnsFailureWhenRequiredHeaderContainsIncorrectValue() throws IOException {
+        Map<String,Predicate<String>> passedHeaders = new HashMap<>();
+        passedHeaders.put("User-Id", handlerHelper.isUUID());
+        passedHeaders.put("Content-Type", handlerHelper.isJsonContentType());
+        passedHeaders.put("Authorisation", handlerHelper.anyValue());
+
+        Headers mockedHeaders = new Headers();
+        mockedHeaders.add("Content-Type", "application/pdf");
+        mockedHeaders.add("User-Id", "123e4567-e89b-12d3-a456-426614174000");
+        mockedHeaders.add("Authorisation", "eyJhbGciOiJIUzI1NiJ9.eN");
+
+        when(exchange.getRequestHeaders()).thenReturn(mockedHeaders);
+
+        HandlerHelper.HeaderValidationResult response = handlerHelper.validateHeaders(exchange, passedHeaders);
+
+        assertFalse(response.isValid());
+        assertNull(response.getValues());
+        exchange.sendResponseHeaders(400, -1);
+    }
+
+    @Test
+    void successFactoryProducesValidResultWithValues() {
+        Map<String, String> values = new HashMap<>();
+        values.put("Content-Type", "application/json");
+
+        HandlerHelper.HeaderValidationResult response = HandlerHelper.HeaderValidationResult.success(values);
+
+        assertTrue(response.isValid());
+        assertNotNull(response.getValues());
+        assertEquals(1, response.getValues().size());
+        assertEquals("application/json", response.getValues().get("Content-Type"));
+    }
+
+    @Test
+    void failureFactoryProducesInvalidResultWithNullValues() {
+        HandlerHelper.HeaderValidationResult response = HandlerHelper.HeaderValidationResult.failure(400, "Header missing X");
+
+        assertFalse(response.isValid());
+        assertNull(response.getValues());
     }
 
 }
